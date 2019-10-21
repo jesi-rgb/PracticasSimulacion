@@ -8,9 +8,9 @@ octaves = 6
 persistence = 0.5
 lacunarity = 2.0
 
-blue = [65, 105, 225]
-green = [34, 139, 34]
-beach = [238, 214, 175]
+blue = (65, 105, 225)
+green = (34, 139, 34)
+beach = (238, 214, 175)
 
 world = np.zeros(shape)
 
