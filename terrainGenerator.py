@@ -5,16 +5,20 @@ from PIL import Image
 shape = (1024, 1024)
 scale = 500.0
 octaves = 6
-persistence = 0.5
+persistence = 0.45
 lacunarity = 2
 
 blue = [65, 105, 225]
 green = [34, 139, 34]
-beach = [238, 214, 175]
+beach = [240, 233, 175]
+lightGreen = [119, 204, 65]
+darkGreen = [17, 74, 17]
 snow = [255, 250, 250]
 mountain = [139, 137, 137]
 
 world = np.zeros(shape)
+
+seed = 234567546
 
 
 # functions
@@ -26,9 +30,11 @@ def display_world(world):
 def add_color(world):
     color_world = np.zeros((shape[0], shape[1], 3), 'uint8')
 
-    color_world[world < 100] = blue
-    color_world[(world >= 100) & (world < 120)] = beach
-    color_world[(world >= 120) & (world < 190)] = green
+    color_world[world < 60] = blue
+    color_world[(world >= 60) & (world < 70)] = beach
+    color_world[(world >= 70) & (world < 100)] = lightGreen
+    color_world[(world >= 100) & (world < 150)] = green
+    color_world[(world >= 150) & (world < 190)] = darkGreen
     color_world[(world >= 190) & (world < 240)] = mountain
     color_world[world > 240] = snow
 
@@ -47,8 +53,8 @@ def normalize(oldWorld, newMin, newMax):
 def generateWorld(shape, world, scale, octaves, persistence, lacunarity):
     for i in range(shape[0]):
         for j in range(shape[1]):
-            world[i][j] = noise.pnoise2(i / scale,
-                                        j / scale,
+            world[i][j] = noise.pnoise2(i / scale + 50,
+                                        j / scale + 50,
                                         octaves=octaves,
                                         persistence=persistence,
                                         lacunarity=lacunarity,
