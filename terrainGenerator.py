@@ -1,18 +1,18 @@
 import noise
 import numpy as np
-import matplotlib.pyplot as plt
 from PIL import Image
-import sklearn
 
 shape = (1024, 1024)
-scale = 100.0
+scale = 500.0
 octaves = 6
 persistence = 0.5
-lacunarity = 1.37
+lacunarity = 2
 
 blue = [65, 105, 225]
 green = [34, 139, 34]
 beach = [238, 214, 175]
+snow = [255, 250, 250]
+mountain = [139, 137, 137]
 
 world = np.zeros(shape)
 
@@ -31,8 +31,12 @@ def add_color(world):
                 color_world[i][j] = blue
             elif world[i][j] < 120:
                 color_world[i][j] = beach
-            elif world[i][j] < 255:
+            elif world[i][j] < 190:
                 color_world[i][j] = green
+            elif world[i][j] < 240:
+                color_world[i][j] = mountain
+            elif world[i][j] < 255:
+                color_world[i][j] = snow
 
     return color_world
 
@@ -64,6 +68,6 @@ def generateWorld(shape, world, scale, octaves, persistence, lacunarity):
 if __name__ == "__main__":
     world = generateWorld(shape, world, scale, octaves, persistence,
                           lacunarity)
-    display_world(world)
+    # display_world(world)
     colored_world = add_color(world)
     display_world(colored_world)
