@@ -25,18 +25,12 @@ def display_world(world):
 
 def add_color(world):
     color_world = np.zeros((shape[0], shape[1], 3), 'uint8')
-    for i in range(shape[0]):
-        for j in range(shape[1]):
-            if world[i][j] < 100:
-                color_world[i][j] = blue
-            elif world[i][j] < 120:
-                color_world[i][j] = beach
-            elif world[i][j] < 190:
-                color_world[i][j] = green
-            elif world[i][j] < 240:
-                color_world[i][j] = mountain
-            elif world[i][j] < 255:
-                color_world[i][j] = snow
+
+    color_world[world < 100] = blue
+    color_world[(world >= 100) & (world < 120)] = beach
+    color_world[(world >= 120) & (world < 190)] = green
+    color_world[(world >= 190) & (world < 240)] = mountain
+    color_world[world > 240] = snow
 
     return color_world
 
