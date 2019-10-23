@@ -17,14 +17,14 @@ class Terrain:
     darkGreen = [17, 74, 17]
     snow = [255, 250, 250]
     mountain = [139, 137, 137]
-    seed = 234567546
+    seed = 2222
     world = None
 
     # functions
     def __init__(self, shape, scale, octaves, persistence, lacunarity):
         self.world = self.normalize(
-            self.generateWorld(shape, scale, octaves, persistence, lacunarity),
-            0, 255)
+            self.generate_world(shape, scale, octaves, persistence,
+                                lacunarity), 0, 255)
 
     def normalize(self, oldWorld, newMin, newMax):
         '''Normalizes de input array between newMin and newMax.'''
@@ -35,13 +35,13 @@ class Terrain:
         newWorld = (oldWorld - oldMin) * factor + newMin
         return newWorld
 
-    def generateWorld(self, shape, scale, octaves, persistence, lacunarity):
+    def generate_world(self, shape, scale, octaves, persistence, lacunarity):
         '''Generates a numpy array filled with noise values which are then normalized.'''
         world = np.zeros(shape)
         for i in range(shape[0]):
             for j in range(shape[1]):
-                world[i][j] = noise.pnoise3(i / scale + 50,
-                                            j / scale + 50,
+                world[i][j] = noise.pnoise3(i / scale,
+                                            j / scale,
                                             self.seed,
                                             octaves=octaves,
                                             persistence=persistence,
