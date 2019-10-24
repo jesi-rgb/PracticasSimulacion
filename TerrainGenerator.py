@@ -26,8 +26,8 @@ class Terrain:
         self.world = self.normalize(
             self.generateWorld(shape, scale, octaves, persistence, lacunarity),
             0, 255)
-        self.manipulable_world = manipulable_world = np.zeros((self.world.shape[0], self.world.shape[1], 2),
-                                                              'uint8')
+        self.manipulable_world = manipulable_world = np.zeros(
+            (self.world.shape[0], self.world.shape[1], 2), 'uint8')
 
     def normalize(self, oldWorld, newMin, newMax):
         '''Normalizes de input array between newMin and newMax.'''
@@ -107,7 +107,7 @@ if __name__ == "__main__":
     # lacunarity = 2
     terrain = Terrain((800, 800), 500.0, 6, 0.45, 2)
     terrain.add_color()
-    np.save("Terrain",terrain.world)
-    np.save("Manipulable_terrain",terrain.manipulable_world)
-    print(terrain.manipulable_world.shape)
+    np.save("Terrain", terrain.world)
+    np.save("Manipulable_terrain", terrain.manipulable_world)
+    print(terrain.manipulable_world)
     #terrain.display_world()
