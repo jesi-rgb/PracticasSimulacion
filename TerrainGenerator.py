@@ -38,13 +38,13 @@ class Terrain:
         newWorld = (oldWorld - oldMin) * factor + newMin
         return newWorld
 
-    def generateWorld(self, shape, scale, octaves, persistence, lacunarity):
+    def generate_world(self, shape, scale, octaves, persistence, lacunarity):
         '''Generates a numpy array filled with noise values which are then normalized.'''
         world = np.zeros(shape)
         for i in range(shape[0]):
             for j in range(shape[1]):
-                world[i][j] = noise.pnoise3(i / scale + 50,
-                                            j / scale + 50,
+                world[i][j] = noise.pnoise3(i / scale,
+                                            j / scale,
                                             self.seed,
                                             octaves=octaves,
                                             persistence=persistence,
