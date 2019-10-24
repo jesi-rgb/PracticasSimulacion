@@ -10,21 +10,24 @@ class Terrain:
 
     DO NOT FORGET TO ADD SELF in front of any attribute we may want to refer to.
     '''
-    blue = [65, 105, 225]
-    green = [34, 139, 34]
-    beach = [240, 233, 175]
-    lightGreen = [119, 204, 65]
-    darkGreen = [17, 74, 17]
-    snow = [255, 250, 250]
-    mountain = [139, 137, 137]
-    seed = 2222
+    blue = np.array([65, 105, 225])
+    green = np.array([34, 139, 34])
+    beach = np.array([240, 233, 175])
+    lightGreen = np.array([119, 204, 65])
+    darkGreen = np.array([17, 74, 17])
+    snow = np.array([255, 250, 250])
+    mountain = np.array([139, 137, 137])
+    seed = 234567546
     world = None
+    manipulable_world = None
 
     # functions
     def __init__(self, shape, scale, octaves, persistence, lacunarity):
         self.world = self.normalize(
-            self.generate_world(shape, scale, octaves, persistence,
-                                lacunarity), 0, 255)
+            self.generateWorld(shape, scale, octaves, persistence, lacunarity),
+            0, 255)
+        self.manipulable_world = manipulable_world = np.zeros(
+            (self.world.shape[0], self.world.shape[1], 2), 'uint8')
 
     def normalize(self, oldWorld, newMin, newMax):
         '''Normalizes de input array between newMin and newMax.'''
@@ -69,13 +72,29 @@ class Terrain:
         color_world = np.zeros((self.world.shape[0], self.world.shape[1], 3),
                                'uint8')
 
-        color_world[self.world < 60] = self.blue
-        color_world[(self.world >= 60) & (self.world < 70)] = self.beach
-        color_world[(self.world >= 70) & (self.world < 100)] = self.lightGreen
-        color_world[(self.world >= 100) & (self.world < 150)] = self.green
-        color_world[(self.world >= 150) & (self.world < 190)] = self.darkGreen
-        color_world[(self.world >= 190) & (self.world < 240)] = self.mountain
-        color_world[self.world > 240] = self.snow
+        blueCondition = self.world < 60
+        beachCondition = (self.world >= 60) & (self.world < 70)
+        lightGreenCondition = (self.world >= 70) & (self.world < 100)
+        greenCondition = (self.world >= 100) & (self.world < 150)
+        darkGreenCondition = (self.world >= 150) & (self.world < 190)
+        mountainCondition = (self.world >= 190) & (self.world < 240)
+        snowCondition = self.world > 240
+
+        color_world[blueCondition] = self.blue
+        color_world[beachCondition] = self.beach
+        color_world[lightGreenCondition] = self.lightGreen
+        color_world[greenCondition] = self.green
+        color_world[darkGreenCondition] = self.darkGreen
+        color_world[mountainCondition] = self.mountain
+        color_world[snowCondition] = self.snow
+
+        self.manipulable_world[blueCondition][0] = 0
+        self.manipulable_world[beachCondition][0] = 1
+        self.manipulable_world[lightGreenCondition][0] = 2
+        self.manipulable_world[greenCondition][0] = 3
+        self.manipulable_world[darkGreenCondition][0] = 4
+        self.manipulable_world[mountainCondition][0] = 5
+        self.manipulable_world[snowCondition][0] = 6
 
         self.world = color_world
 
@@ -88,4 +107,7 @@ if __name__ == "__main__":
     # lacunarity = 2
     terrain = Terrain((800, 800), 500.0, 6, 0.45, 2)
     terrain.add_color()
-    terrain.display_world()
+    np.save("Terrain", terrain.world)
+    np.save("Manipulable_terrain", terrain.manipulable_world)
+    print(terrain.manipulable_world)
+    #terrain.display_world()
