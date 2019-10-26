@@ -88,13 +88,13 @@ class Terrain:
         color_world[mountainCondition] = self.mountain
         color_world[snowCondition] = self.snow
 
-        self.manipulable_world[blueCondition][0] = 0
-        self.manipulable_world[beachCondition][0] = 1
-        self.manipulable_world[lightGreenCondition][0] = 2
-        self.manipulable_world[greenCondition][0] = 3
-        self.manipulable_world[darkGreenCondition][0] = 4
-        self.manipulable_world[mountainCondition][0] = 5
-        self.manipulable_world[snowCondition][0] = 6
+        self.manipulable_world[blueCondition] = [0,0]
+        self.manipulable_world[beachCondition] = [1,0]
+        self.manipulable_world[lightGreenCondition] = [2,0]
+        self.manipulable_world[greenCondition] = [3,0]
+        self.manipulable_world[darkGreenCondition]= [4,0]
+        self.manipulable_world[mountainCondition] = [5,0]
+        self.manipulable_world[snowCondition] = [6,0]
 
         self.world = color_world
 
