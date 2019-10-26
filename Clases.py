@@ -17,6 +17,13 @@ class Animal:
         self.x = 0
         self.y = 0
 
+    def action(self, terrain):
+        self.hunger += 0.01
+        if self.hunger == 1:
+            pass #Die
+
+        #Check map with vision_field
+
         
 class Rabbit(Animal):
     
