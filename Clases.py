@@ -4,7 +4,7 @@ REPRODUCTIONH_FEELING_LIMIT = 0.5
 ATTACK_LIMIT = 0.1
 MIN_SPEED = 5
 MAX_SPEED = 20
-EAT_DELAY = 3 #ticks
+EAT_DELAY = 3  #ticks
 HUNGER_QUENCH = 0.3
 
 #CASILLAS
@@ -17,6 +17,9 @@ ZANAHORIA_LINCE = 5
 CONEJO_LINCE = 6
 
 import Funciones
+from PIL import Image
+import numpy as np
+
 
 class Animal:
     def __init__(self):
@@ -40,23 +43,23 @@ class Animal:
     def action(self, terrain):
         self.hunger += HUNGER_LOSS
         if self.hunger == 1:
-            pass #Die
-    
+            pass  #Die
+
     def move(diffX, diffY):
         self.x += diffX / abs(diffX)
         self.y += diffY / abs(diffY)
 
 
-
-
 class Rabbit(Animal):
-    
     def __init__(self):
         Animal.__init__(self)
 
+    def display_rabbit(self, terrain, x, y):
+        print(terrain.shape)
+        terrain[x][y] = np.array([255, 255, 255])
+
     def action(self, terrain):
         '''Función para calcular nuestra siguiente acción.'''
-
 
         Animal.action(terrain)
 
@@ -66,8 +69,9 @@ class Rabbit(Animal):
         vision_scan, nearest_coord = NADA, (None, None)
         dist = None
         for i in range(self.x - self.vision_field, self.x + self.vision_field):
-            for j in range(self.x - self.vision_field, self.x + self.vision_field):
-                
+            for j in range(self.x - self.vision_field,
+                           self.x + self.vision_field):
+
                 #si vemos una casilla con un lince
                 if terrain[i][j] >= LINCE:
                     if vision_scan >= LINCE:
@@ -80,7 +84,8 @@ class Rabbit(Animal):
                         dist = Funciones.dist((self.x, self.y), (i, j))
 
                 #si no hay linces
-                elif vision_scan < LINCE and has_hunger and terrain[i][j] == ZANAHORIA:
+                elif vision_scan < LINCE and has_hunger and terrain[i][
+                        j] == ZANAHORIA:
                     if vision_scan == ZANAHORIA:
                         auxDist = Funciones.dist((i, j), (self.x, self.y))
                         if auxDist < dist:
@@ -90,7 +95,8 @@ class Rabbit(Animal):
                         vision_scan, nearest_coord = ZANAHORIA, (i, j)
                         dist = Funciones.dist((self.x, self.y), (i, j))
 
-                elif vision_scan < ZANAHORIA and terrain[i][j] == ZANAHORIA_CONEJO and self.hunger*self.risk_aversion < ATTACK_LIMIT:
+                elif vision_scan < ZANAHORIA and terrain[i][
+                        j] == ZANAHORIA_CONEJO and self.hunger * self.risk_aversion < ATTACK_LIMIT:
                     if vision_scan == ZANAHORIA_CONEJO:
                         auxDist = Funciones.dist((i, j), (self.x, self.y))
                         if auxDist < dist:
@@ -99,8 +105,9 @@ class Rabbit(Animal):
                     else:
                         vision_scan, nearest_coord = ZANAHORIA_CONEJO, (i, j)
                         dist = Funciones.dist((self.x, self.y), (i, j))
-                    
-                elif vision_scan < ZANAHORIA_CONEJO and want_reproduction and terrain[i][j] == 2:
+
+                elif vision_scan < ZANAHORIA_CONEJO and want_reproduction and terrain[
+                        i][j] == 2:
                     if vision_scan == CONEJO:
                         auxDist = Funciones.dist((i, j), (self.x, self.y))
                         if auxDist < dist:
@@ -113,44 +120,41 @@ class Rabbit(Animal):
             #veredicto final vision_scan
             if vision_scan >= LINCE:
                 flee(coord[0], coord[1])
-            elif vision_scan == NADA
-                pass #nos movemos random e inteligentemente
+            elif vision_scan == NADA:
+                pass  #nos movemos random e inteligentemente
             else:
-                goTo(coord[0], coord[1]) #vamos a comer o follar
-
-
+                goTo(coord[0], coord[1])  #vamos a comer o follar
 
     def goTo(i, j):
         '''Función para ir a las coordenadas indicadas'''
         diffX = i - self.x
         diffY = j - self.j
-        
+
         Animal.move(diffX, diffY)
 
     def flee(i, j):
         '''Función para huir de las coordenadas indicadas'''
         diffX = self.x - i
         diffY = self.y - j
-        
+
         Animal.move(diffX, diffY)
 
     def eat():
         #pasan los ticks de comer
         self.hunger -= HUNGER_QUENCH
-        terrain[self.x][self.y] = CONEJO #solo estoy yo
-
+        terrain[self.x][self.y] = CONEJO  #solo estoy yo
 
     def attack():
+        pass
 
     def reproduce():
+        pass
 
 
-
-        
-        
 class Lynx(Animal):
-    
     def __init__(self):
         Animal.__init__(self)
         self.suffocation = 0
 
+    def display_lynx(terrain, x, y):
+        terrain[x][y] = [207, 147, 45]

@@ -24,10 +24,12 @@ class Terrain:
     # functions
     def __init__(self, shape, scale, octaves, persistence, lacunarity):
         self.world = self.normalize(
-            self.generateWorld(shape, scale, octaves, persistence, lacunarity),
-            0, 255)
-        self.manipulable_world = manipulable_world = np.zeros(
+            self.generate_world(shape, scale, octaves, persistence,
+                                lacunarity), 0, 255)
+        self.manipulable_world = np.zeros(
             (self.world.shape[0], self.world.shape[1], 2), 'uint8')
+
+        print(self.manipulable_world.shape)
 
     def normalize(self, oldWorld, newMin, newMax):
         '''Normalizes de input array between newMin and newMax.'''

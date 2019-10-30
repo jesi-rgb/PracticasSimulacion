@@ -1,9 +1,15 @@
 # import the pygame module, so you can use it
 import pygame
+from TerrainGenerator import Terrain
+
 
 # define a main function
 def main():
-    x, y = 800, 600
+    width, height = 800, 800
+
+    terrain = Terrain((width, height), 500.0, 6, 0.45, 2)
+    terrain.add_color()
+
     clock = pygame.time.Clock()
 
     white = (255, 255, 255)
@@ -12,30 +18,19 @@ def main():
     green = (0, 255, 0)
     blue = (0, 0, 255)
 
-
     # initialize the pygame module
     pygame.init()
-    # load and set the logo
-    # logo = pygame.image.load("logo32x32.png")
-    # pygame.display.set_icon(logo)
     pygame.display.set_caption("Proyecto Simulacion")
-    # create a surface on screen that has the size of 240 x 180
-    screen = pygame.display.set_mode((x, y))
 
-    # define a variable to control the main loop
+    screen = pygame.display.set_mode((width, height))
+    image = pygame.image.load("media/mapa_definitivo.png")
+
     running = True
 
     # main loop
     while running:
         # event handling, gets all event from the event queue
-        if pygame.time.get_ticks() % 10 == 0:
-            screen.fill(red)
-        else:
-            if pygame.time.get_ticks() % 10 == 10:
-                screen.fill(green)
-            else:
-                if pygame.time.get_ticks() % 10 == 20:
-                    screen.fill(blue)
+        screen.blit(image, (0, 0))
         pygame.display.update()
 
         for event in pygame.event.get():
