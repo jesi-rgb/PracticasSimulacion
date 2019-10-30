@@ -24,8 +24,8 @@ class Terrain:
     # functions
     def __init__(self, shape, scale, octaves, persistence, lacunarity):
         self.world = self.normalize(
-            self.generate_world(shape, scale, octaves, persistence,
-                                lacunarity), 0, 255)
+            self.generateWorld(shape, scale, octaves, persistence, lacunarity),
+            0, 255)
         self.manipulable_world = manipulable_world = np.zeros(
             (self.world.shape[0], self.world.shape[1], 2), 'uint8')
 
