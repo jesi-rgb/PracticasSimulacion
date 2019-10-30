@@ -43,8 +43,8 @@ class Terrain:
         world = np.zeros(shape)
         for i in range(shape[0]):
             for j in range(shape[1]):
-                world[i][j] = noise.pnoise3(i / scale,
-                                            j / scale,
+                world[i][j] = noise.pnoise3(i / scale + 22.75,
+                                            j / scale + 89.75,
                                             self.seed,
                                             octaves=octaves,
                                             persistence=persistence,
@@ -88,13 +88,13 @@ class Terrain:
         color_world[mountainCondition] = self.mountain
         color_world[snowCondition] = self.snow
 
-        self.manipulable_world[blueCondition][0] = 0
-        self.manipulable_world[beachCondition][0] = 1
-        self.manipulable_world[lightGreenCondition][0] = 2
-        self.manipulable_world[greenCondition][0] = 3
-        self.manipulable_world[darkGreenCondition][0] = 4
-        self.manipulable_world[mountainCondition][0] = 5
-        self.manipulable_world[snowCondition][0] = 6
+        self.manipulable_world[blueCondition] = [0, 0]
+        self.manipulable_world[beachCondition] = [1, 0]
+        self.manipulable_world[lightGreenCondition] = [2, 0]
+        self.manipulable_world[greenCondition] = [3, 0]
+        self.manipulable_world[darkGreenCondition] = [4, 0]
+        self.manipulable_world[mountainCondition] = [5, 0]
+        self.manipulable_world[snowCondition] = [6, 0]
 
         self.world = color_world
 
@@ -109,5 +109,5 @@ if __name__ == "__main__":
     terrain.add_color()
     np.save("Terrain", terrain.world)
     np.save("Manipulable_terrain", terrain.manipulable_world)
-    print(terrain.manipulable_world)
-    #terrain.display_world()
+    print(terrain.manipulable_world.shape)
+    terrain.display_world()
