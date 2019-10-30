@@ -26,8 +26,8 @@ class Terrain:
         self.world = self.normalize(
             self.generateWorld(shape, scale, octaves, persistence, lacunarity),
             0, 255)
-        self.manipulable_world = manipulable_world = np.zeros((self.world.shape[0], self.world.shape[1], 2),
-                                                              'uint8')
+        self.manipulable_world = manipulable_world = np.zeros(
+            (self.world.shape[0], self.world.shape[1], 2), 'uint8')
 
     def normalize(self, oldWorld, newMin, newMax):
         '''Normalizes de input array between newMin and newMax.'''
@@ -43,8 +43,8 @@ class Terrain:
         world = np.zeros(shape)
         for i in range(shape[0]):
             for j in range(shape[1]):
-                world[i][j] = noise.pnoise3(i / scale + 50,
-                                            j / scale + 50,
+                world[i][j] = noise.pnoise3(i / scale + 22.75,
+                                            j / scale + 89.75,
                                             self.seed,
                                             octaves=octaves,
                                             persistence=persistence,
@@ -88,13 +88,13 @@ class Terrain:
         color_world[mountainCondition] = self.mountain
         color_world[snowCondition] = self.snow
 
-        self.manipulable_world[blueCondition] = [0,0]
-        self.manipulable_world[beachCondition] = [1,0]
-        self.manipulable_world[lightGreenCondition] = [2,0]
-        self.manipulable_world[greenCondition] = [3,0]
-        self.manipulable_world[darkGreenCondition]= [4,0]
-        self.manipulable_world[mountainCondition] = [5,0]
-        self.manipulable_world[snowCondition] = [6,0]
+        self.manipulable_world[blueCondition] = [0, 0]
+        self.manipulable_world[beachCondition] = [1, 0]
+        self.manipulable_world[lightGreenCondition] = [2, 0]
+        self.manipulable_world[greenCondition] = [3, 0]
+        self.manipulable_world[darkGreenCondition] = [4, 0]
+        self.manipulable_world[mountainCondition] = [5, 0]
+        self.manipulable_world[snowCondition] = [6, 0]
 
         self.world = color_world
 
@@ -107,7 +107,7 @@ if __name__ == "__main__":
     # lacunarity = 2
     terrain = Terrain((800, 800), 500.0, 6, 0.45, 2)
     terrain.add_color()
-    np.save("Terrain",terrain.world)
-    np.save("Manipulable_terrain",terrain.manipulable_world)
+    np.save("Terrain", terrain.world)
+    np.save("Manipulable_terrain", terrain.manipulable_world)
     print(terrain.manipulable_world.shape)
-    #terrain.display_world()
+    terrain.display_world()
