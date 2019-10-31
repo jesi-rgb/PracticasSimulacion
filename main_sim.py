@@ -1,6 +1,8 @@
 # import the pygame module, so you can use it
 import pygame
 from TerrainGenerator import Terrain
+import Clases
+import time
 
 
 # define a main function
@@ -23,23 +25,31 @@ def main():
     pygame.display.set_caption("Proyecto Simulacion")
 
     screen = pygame.display.set_mode((width, height))
-    image = pygame.image.load("media/mapa_definitivo.png")
 
+    rabo = Clases.Rabbit()
     running = True
+    i = 200
 
-    # main loop
     while running:
         # event handling, gets all event from the event queue
+
+        # conejo se mueve en manipulable world
+        # i += 1
+        rabo.goTo(200, 200)
+        rabo.display_rabbit(terrain.manipulable_world)
+
+        # generamos terrain.world from manipulable world
+        terrain.recalculate_world()
+
+        # generamos la imagen y la updateamos
+        image = pygame.image.frombuffer(terrain.world, (width, height), "RGB")
+
         screen.blit(image, (0, 0))
         pygame.display.update()
 
+        time.sleep(1.0)
         for event in pygame.event.get():
-            # only do something if the event is of type QUIT
             if event.type == pygame.QUIT:
-                # change the value to False, to exit the main loop
-                running = False
-
-            if event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:
                 running = False
 
 
