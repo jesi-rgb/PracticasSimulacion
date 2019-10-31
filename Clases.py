@@ -37,26 +37,31 @@ class Animal:
         self.time_alive = 0
 
         #Map position
-        self.x = 0
-        self.y = 0
+        self.x = int(100)
+        self.y = int(100)
 
     def action(self, terrain):
         self.hunger += HUNGER_LOSS
         if self.hunger == 1:
             pass  #Die
 
-    def move(diffX, diffY):
-        self.x += diffX / abs(diffX)
-        self.y += diffY / abs(diffY)
+    def move(self, diffX, diffY):
+        if not (diffX == 0 or diffY == 0):
+            self.x += int(diffX / abs(diffX))
+            self.y += int(diffY / abs(diffY))
+        else:
+            self.x += 0
+            self.y += 0
 
 
 class Rabbit(Animal):
     def __init__(self):
         Animal.__init__(self)
 
-    def display_rabbit(self, terrain, x, y):
-        print(terrain.shape)
-        terrain[x][y] = np.array([255, 255, 255])
+    def display_rabbit(self, terrain):
+
+        oldValue = terrain[self.x][self.y]
+        terrain[self.x][self.y] = [oldValue[0], CONEJO]
 
     def action(self, terrain):
         '''Función para calcular nuestra siguiente acción.'''
@@ -125,29 +130,29 @@ class Rabbit(Animal):
             else:
                 goTo(coord[0], coord[1])  #vamos a comer o follar
 
-    def goTo(i, j):
+    def goTo(self, i, j):
         '''Función para ir a las coordenadas indicadas'''
         diffX = i - self.x
-        diffY = j - self.j
+        diffY = j - self.y
 
-        Animal.move(diffX, diffY)
+        self.move(diffX, diffY)
 
-    def flee(i, j):
+    def flee(self, i, j):
         '''Función para huir de las coordenadas indicadas'''
         diffX = self.x - i
         diffY = self.y - j
 
-        Animal.move(diffX, diffY)
+        self.move(diffX, diffY)
 
-    def eat():
+    def eat(self):
         #pasan los ticks de comer
         self.hunger -= HUNGER_QUENCH
         terrain[self.x][self.y] = CONEJO  #solo estoy yo
 
-    def attack():
+    def attack(self):
         pass
 
-    def reproduce():
+    def reproduce(self):
         pass
 
 

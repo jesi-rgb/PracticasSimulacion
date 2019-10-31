@@ -28,14 +28,12 @@ def main():
 
     rabo = Clases.Rabbit()
     running = True
-    i = 200
 
     while running:
         # event handling, gets all event from the event queue
 
         # conejo se mueve en manipulable world
-        # i += 1
-        rabo.goTo(200, 200)
+        rabo.goTo(110, 110)
         rabo.display_rabbit(terrain.manipulable_world)
 
         # generamos terrain.world from manipulable world
@@ -47,9 +45,12 @@ def main():
         screen.blit(image, (0, 0))
         pygame.display.update()
 
-        time.sleep(1.0)
+        terrain.reset_worlds()
+
+        time.sleep(.033)
         for event in pygame.event.get():
-            if event.type == pygame.QUIT:
+            if event.type == pygame.QUIT or (event.type == pygame.KEYDOWN
+                                             and event.key == pygame.K_ESCAPE):
                 running = False
 
 

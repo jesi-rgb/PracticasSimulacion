@@ -1,6 +1,7 @@
 import noise
 import numpy as np
 from PIL import Image
+from Clases import CONEJO, LINCE
 
 
 class Terrain:
@@ -10,16 +11,21 @@ class Terrain:
 
     DO NOT FORGET TO ADD SELF in front of any attribute we may want to refer to.
     '''
+    white = np.array([255, 255, 255])
+    orange = np.array([207, 147, 45])
+
     blue = np.array([65, 105, 225])
     green = np.array([34, 139, 34])
     beach = np.array([240, 233, 175])
     lightGreen = np.array([119, 204, 65])
     darkGreen = np.array([17, 74, 17])
-    snow = np.array([255, 250, 250])
+    snow = np.array([250, 250, 250])
     mountain = np.array([139, 137, 137])
+
     seed = 234567546
     world = None
     manipulable_world = None
+    original_world = None
 
     # functions
     def __init__(self, shape, scale, octaves, persistence, lacunarity):
@@ -29,7 +35,7 @@ class Terrain:
         self.manipulable_world = np.zeros(
             (self.world.shape[0], self.world.shape[1], 2), 'uint8')
 
-        print(self.manipulable_world.shape)
+        self.original_world = np.copy(self.manipulable_world)
 
     def normalize(self, oldWorld, newMin, newMax):
         '''Normalizes de input array between newMin and newMax.'''
@@ -54,6 +60,7 @@ class Terrain:
                                             repeatx=1024,
                                             repeaty=1024,
                                             base=0)
+
         return world
 
     def display_world(self):
@@ -90,15 +97,44 @@ class Terrain:
         color_world[mountainCondition] = self.mountain
         color_world[snowCondition] = self.snow
 
-        self.manipulable_world[blueCondition] = [0, 0]
-        self.manipulable_world[beachCondition] = [1, 0]
-        self.manipulable_world[lightGreenCondition] = [2, 0]
-        self.manipulable_world[greenCondition] = [3, 0]
-        self.manipulable_world[darkGreenCondition] = [4, 0]
-        self.manipulable_world[mountainCondition] = [5, 0]
-        self.manipulable_world[snowCondition] = [6, 0]
+        self.manipulable_world[blueCondition] = (0, 0)
+        self.manipulable_world[beachCondition] = (1, 0)
+        self.manipulable_world[lightGreenCondition] = (2, 0)
+        self.manipulable_world[greenCondition] = (3, 0)
+        self.manipulable_world[darkGreenCondition] = (4, 0)
+        self.manipulable_world[mountainCondition] = (5, 0)
+        self.manipulable_world[snowCondition] = (6, 0)
 
         self.world = color_world
+        # np.save("world", self.world)
+        np.save("manipulable_world", self.manipulable_world)
+
+    def recalculate_world(self):
+        '''Función para recalcular el mundo en base a la posición nueva que toman los animales'''
+        bunnyCondition = self.manipulable_world == [int, CONEJO]
+        bunnyCondition = bunnyCondition[:, :, 1]
+        self.world[bunnyCondition] = self.white
+
+    def reset_worlds(self):
+        '''Función para resetear ambos mundos y prepararlos para el siguiente tick'''
+        self.manipulable_world = np.load("manipulable_world.npy")
+        # self.manipulable_world = self.original_world
+
+        blueCondition = self.manipulable_world == [0, int]
+        beachCondition = self.manipulable_world == [1, int]
+        lightGreenCondition = self.manipulable_world == [2, int]
+        greenCondition = self.manipulable_world == [3, int]
+        darkGreenCondition = self.manipulable_world == [4, int]
+        mountainCondition = self.manipulable_world == [5, int]
+        snowCondition = self.manipulable_world == [6, int]
+
+        self.world[blueCondition[:, :, 0]] = self.blue
+        self.world[beachCondition[:, :, 0]] = self.beach
+        self.world[lightGreenCondition[:, :, 0]] = self.lightGreen
+        self.world[greenCondition[:, :, 0]] = self.green
+        self.world[darkGreenCondition[:, :, 0]] = self.darkGreen
+        self.world[mountainCondition[:, :, 0]] = self.mountain
+        self.world[snowCondition[:, :, 0]] = self.snow
 
 
 if __name__ == "__main__":
