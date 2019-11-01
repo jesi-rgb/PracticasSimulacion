@@ -2,7 +2,7 @@
 import pygame
 from TerrainGenerator import Terrain
 import Clases
-import time
+import time, random, numpy as np
 
 
 # define a main function
@@ -14,12 +14,6 @@ def main():
 
     clock = pygame.time.Clock()
 
-    white = (255, 255, 255)
-    black = (0, 0, 0)
-    red = (255, 0, 0)
-    green = (0, 255, 0)
-    blue = (0, 0, 255)
-
     # initialize the pygame module
     pygame.init()
     pygame.display.set_caption("Proyecto Simulacion")
@@ -28,13 +22,19 @@ def main():
 
     rabo = Clases.Rabbit()
     running = True
+    zanahorias = []
 
     while running:
-        # event handling, gets all event from the event queue
+
+        if random.random() < .4:
+            zanahorias.append(Clases.Zanahoria())
+
+        for z in zanahorias:
+            z.display(terrain.manipulable_world)
 
         # conejo se mueve en manipulable world
-        rabo.goTo(110, 110)
-        rabo.display_rabbit(terrain.manipulable_world)
+        rabo.goTo(200, 200)
+        rabo.display(terrain.manipulable_world)
 
         # generamos terrain.world from manipulable world
         terrain.recalculate_world()
@@ -42,12 +42,14 @@ def main():
         # generamos la imagen y la updateamos
         image = pygame.image.frombuffer(terrain.world, (width, height), "RGB")
 
+        # finalmente, reproducimos la nueva imagen
         screen.blit(image, (0, 0))
         pygame.display.update()
 
+        # reseteamos los mundos para la siguiente iteración
         terrain.reset_worlds()
 
-        time.sleep(.033)
+        # rutina para poder salir de la aplicación
         for event in pygame.event.get():
             if event.type == pygame.QUIT or (event.type == pygame.KEYDOWN
                                              and event.key == pygame.K_ESCAPE):

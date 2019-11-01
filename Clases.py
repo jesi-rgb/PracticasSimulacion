@@ -19,6 +19,7 @@ CONEJO_LINCE = 6
 import Funciones
 from PIL import Image
 import numpy as np
+import random
 
 
 class Animal:
@@ -58,8 +59,8 @@ class Rabbit(Animal):
     def __init__(self):
         Animal.__init__(self)
 
-    def display_rabbit(self, terrain):
-
+    def display(self, terrain):
+        '''Función para editar el valor x, y del mundo donde nos situamos ahora mismo'''
         oldValue = terrain[self.x][self.y]
         terrain[self.x][self.y] = [oldValue[0], CONEJO]
 
@@ -161,5 +162,16 @@ class Lynx(Animal):
         Animal.__init__(self)
         self.suffocation = 0
 
-    def display_lynx(terrain, x, y):
+    def display(terrain, x, y):
         terrain[x][y] = [207, 147, 45]
+
+
+class Zanahoria():
+    def __init__(self):
+        self.x = random.randint(
+            100, 200)  #habrá que generarlas solo en zonas de hierba
+        self.y = random.randint(100, 200)
+
+    def display(self, terrain):
+        oldValue = terrain[self.x][self.y]
+        terrain[self.x][self.y] = [oldValue[0], ZANAHORIA]

@@ -1,7 +1,7 @@
 import noise
 import numpy as np
 from PIL import Image
-from Clases import CONEJO, LINCE
+from Clases import CONEJO, LINCE, ZANAHORIA
 
 
 class Terrain:
@@ -112,8 +112,13 @@ class Terrain:
     def recalculate_world(self):
         '''Función para recalcular el mundo en base a la posición nueva que toman los animales'''
         bunnyCondition = self.manipulable_world == [int, CONEJO]
+        carrotCondition = self.manipulable_world == [int, ZANAHORIA]
+
         bunnyCondition = bunnyCondition[:, :, 1]
+        carrotCondition = carrotCondition[:, :, 1]
+
         self.world[bunnyCondition] = self.white
+        self.world[carrotCondition] = self.orange
 
     def reset_worlds(self):
         '''Función para resetear ambos mundos y prepararlos para el siguiente tick'''
