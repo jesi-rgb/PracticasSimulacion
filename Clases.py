@@ -4,7 +4,7 @@ REPRODUCTIONH_FEELING_LIMIT = 0.5
 ATTACK_LIMIT = 0.1
 MIN_SPEED = 5
 MAX_SPEED = 20
-EAT_DELAY = 3 #ticks
+EAT_DELAY = 3  #ticks
 HUNGER_QUENCH = 0.3
 MOVES_PER_ACTION = 2
 EXTRA_STEP = 1
@@ -15,13 +15,15 @@ NADA = 0
 CONEJO = 1
 ZANAHORIA_CONEJO = 2
 ZANAHORIA = 3
-PELEA_CONEJO = 4
-PELEA_LINCE = 5
-LINCE = 6
-ZANAHORIA_LINCE = 7
-CONEJO_LINCE = 8
+LINCE = 4
+ZANAHORIA_LINCE = 5
+CONEJO_LINCE = 6
 
 import Funciones
+from PIL import Image
+import numpy as np
+import random
+
 
 class Animal:
     def __init__(self):
@@ -39,24 +41,34 @@ class Animal:
         self.time_alive = 0
 
         #Map position
-        self.x = 0
-        self.y = 0
+        self.x = int(100)
+        self.y = int(100)
 
     def action(self, terrain):
         self.hunger += HUNGER_LOSS
         if self.hunger == 1:
-            pass #Die
+            pass  #Die
 
+    def move(self, diffX, diffY):
+        if not (diffX == 0 or diffY == 0):
+            self.x += int(diffX / abs(diffX))
+            self.y += int(diffY / abs(diffY))
+        else:
+            self.x += 0
+            self.y += 0
 
 
 class Rabbit(Animal):
-    
     def __init__(self):
         Animal.__init__(self)
 
+    def display(self, terrain):
+        '''Función para editar el valor x, y del mundo donde nos situamos ahora mismo'''
+        oldValue = terrain[self.x][self.y]
+        terrain[self.x][self.y] = [oldValue[0], CONEJO]
+
     def action(self, terrain):
         '''Función para calcular nuestra siguiente acción.'''
-
 
         Animal.action(terrain)
 
@@ -66,8 +78,9 @@ class Rabbit(Animal):
         vision_scan, nearest_coord = NADA, (None, None)
         dist = None
         for i in range(self.x - self.vision_field, self.x + self.vision_field):
-            for j in range(self.x - self.vision_field, self.x + self.vision_field):
-                
+            for j in range(self.x - self.vision_field,
+                           self.x + self.vision_field):
+
                 #si vemos una casilla con un lince
                 if terrain[i][j][0] >= LINCE:
                     if vision_scan >= LINCE:
@@ -186,11 +199,21 @@ class Rabbit(Animal):
         pass
 
 
-        
-        
 class Lynx(Animal):
-    
     def __init__(self):
         Animal.__init__(self)
         self.suffocation = 0
 
+    def display(terrain, x, y):
+        terrain[x][y] = [207, 147, 45]
+
+
+class Zanahoria():
+    def __init__(self):
+        self.x = random.randint(
+            100, 200)  #habrá que generarlas solo en zonas de hierba
+        self.y = random.randint(100, 200)
+
+    def display(self, terrain):
+        oldValue = terrain[self.x][self.y]
+        terrain[self.x][self.y] = [oldValue[0], ZANAHORIA]
