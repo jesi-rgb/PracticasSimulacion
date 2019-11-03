@@ -28,9 +28,10 @@ class Terrain:
     original_world = None
 
     # functions
-    def __init__(self, shape, scale, octaves, persistence, lacunarity):
+    def __init__(self, shape, scale, offX, offY, octaves, persistence,
+                 lacunarity):
         self.world = self.normalize(
-            self.generate_world(shape, scale, octaves, persistence,
+            self.generate_world(shape, scale, offX, offY, octaves, persistence,
                                 lacunarity), 0, 255)
         self.manipulable_world = np.zeros(
             (self.world.shape[0], self.world.shape[1], 2), 'uint8')
@@ -46,20 +47,22 @@ class Terrain:
         newWorld = (oldWorld - oldMin) * factor + newMin
         return newWorld
 
-    def generate_world(self, shape, scale, octaves, persistence, lacunarity):
+    def generate_world(self, shape, scale, offX, offY, octaves, persistence,
+                       lacunarity):
         '''Generates a numpy array filled with noise values which are then normalized.'''
         world = np.zeros(shape)
         for i in range(shape[0]):
             for j in range(shape[1]):
-                world[i][j] = noise.pnoise3(i / scale + 22.75,
-                                            j / scale + 89.75,
-                                            self.seed,
-                                            octaves=octaves,
-                                            persistence=persistence,
-                                            lacunarity=lacunarity,
-                                            repeatx=1024,
-                                            repeaty=1024,
-                                            base=0)
+                world[i][j] = noise.pnoise3(
+                    i / scale + offX,  #22.65
+                    j / scale + offY,  #89.55
+                    self.seed,
+                    octaves=octaves,
+                    persistence=persistence,
+                    lacunarity=lacunarity,
+                    repeatx=1024,
+                    repeaty=1024,
+                    base=0)
 
         return world
 

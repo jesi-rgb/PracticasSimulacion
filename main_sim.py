@@ -8,8 +8,11 @@ import time, random, numpy as np
 # define a main function
 def main():
     width, height = 800, 800
+    w_factor = 4
+    h_factor = 4
 
-    terrain = Terrain((width, height), 500.0, 6, 0.45, 2)
+    terrain = Terrain((width // w_factor, height // h_factor), 100.0, 22.55,
+                      89.55, 6, 0.45, 2)
     terrain.add_color()
 
     clock = pygame.time.Clock()
@@ -33,14 +36,16 @@ def main():
             z.display(terrain.manipulable_world)
 
         # conejo se mueve en manipulable world
-        rabo.goTo(200, 200)
+        rabo.goTo(20, 20)
         rabo.display(terrain.manipulable_world)
 
         # generamos terrain.world from manipulable world
         terrain.recalculate_world()
 
         # generamos la imagen y la updateamos
-        image = pygame.image.frombuffer(terrain.world, (width, height), "RGB")
+        image = pygame.image.frombuffer(
+            terrain.world, (width // w_factor, height // h_factor), "RGB")
+        image = pygame.transform.scale(image, (width, height))
 
         # finalmente, reproducimos la nueva imagen
         screen.blit(image, (0, 0))
