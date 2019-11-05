@@ -64,8 +64,15 @@ class Rabbit(Animal):
 
     def display(self, terrain):
         '''Función para editar el valor x, y del mundo donde nos situamos ahora mismo'''
-        oldValue = terrain[self.x][self.y]
-        terrain[self.x][self.y] = [oldValue[0], CONEJO]
+        # oldValue = terrain[self.x][self.y]
+        # terrain[self.x][self.y] = [oldValue[0], CONEJO]
+        if terrain.manipulable_world[self.x][self.y][1] == ZANAHORIA_CONEJO:
+            pass  #ahora es pelea
+
+        if terrain.manipulable_world[self.x][self.y][1] == ZANAHORIA:
+            terrain.manipulable_world[self.x][self.y][1] = ZANAHORIA_CONEJO
+        else:
+            terrain.manipulable_world[self.x][self.y][1] == CONEJO
 
     def action(self, terrain):
         '''Función para calcular nuestra siguiente acción.'''
@@ -179,6 +186,8 @@ class Rabbit(Animal):
             diffY = j - self.y
 
             self.move(diffX, diffY)
+
+        self.display()
 
     def flee(self, i, j):
         '''Función para huir de las coordenadas indicadas'''
