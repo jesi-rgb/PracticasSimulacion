@@ -36,8 +36,6 @@ class Terrain:
         self.manipulable_world = np.zeros(
             (self.world.shape[0], self.world.shape[1], 2), 'uint8')
 
-        self.original_world = np.copy(self.manipulable_world)
-
     def normalize(self, oldWorld, newMin, newMax):
         '''Normalizes de input array between newMin and newMax.'''
         oldMax = oldWorld.max()
@@ -110,7 +108,8 @@ class Terrain:
 
         self.world = color_world
         # np.save("world", self.world)
-        np.save("manipulable_world", self.manipulable_world)
+        # np.save("manipulable_world", self.manipulable_world)
+        self.original_world = np.copy(self.manipulable_world)
 
     def recalculate_world(self):
         '''Función para recalcular el mundo en base a la posición nueva que toman los animales'''
@@ -125,8 +124,7 @@ class Terrain:
 
     def reset_worlds(self):
         '''Función para resetear ambos mundos y prepararlos para el siguiente tick'''
-        self.manipulable_world = np.load("manipulable_world.npy")
-        # self.manipulable_world = self.original_world
+        self.manipulable_world = self.original_world
 
         blueCondition = self.manipulable_world == [0, int]
         beachCondition = self.manipulable_world == [1, int]

@@ -14,6 +14,7 @@ def main():
     terrain = Terrain((width // w_factor, height // h_factor), 100.0, 22.55,
                       89.55, 6, 0.45, 2)
     terrain.add_color()
+    print("World size: ", width // w_factor, height // h_factor)
 
     clock = pygame.time.Clock()
 
@@ -30,14 +31,13 @@ def main():
     while running:
 
         if random.random() < .4:
-            zanahorias.append(Clases.Zanahoria())
+            zanahorias.append(Clases.Zanahoria(terrain.manipulable_world))
 
         for z in zanahorias:
             z.display(terrain.manipulable_world)
 
         # conejo se mueve en manipulable world
-        rabo.goTo(20, 20)
-        rabo.display(terrain.manipulable_world)
+        rabo.goTo(200, 200, terrain.manipulable_world)
 
         # generamos terrain.world from manipulable world
         terrain.recalculate_world()

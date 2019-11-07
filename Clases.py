@@ -77,13 +77,13 @@ class Rabbit(Animal):
         '''Función para editar el valor x, y del mundo donde nos situamos ahora mismo'''
         # oldValue = terrain[self.x][self.y]
         # terrain[self.x][self.y] = [oldValue[0], CONEJO]
-        if terrain.manipulable_world[self.x][self.y][1] == ZANAHORIA_CONEJO:
+        if terrain[self.x][self.y][1] == ZANAHORIA_CONEJO:
             pass  #ahora es pelea
 
-        if terrain.manipulable_world[self.x][self.y][1] == ZANAHORIA:
-            terrain.manipulable_world[self.x][self.y][1] = ZANAHORIA_CONEJO
+        if terrain[self.x][self.y][1] == ZANAHORIA:
+            terrain[self.x][self.y][1] = ZANAHORIA_CONEJO
         else:
-            terrain.manipulable_world[self.x][self.y][1] == CONEJO
+            terrain[self.x][self.y][1] = CONEJO
 
     def action(self, terrain):
         '''Función para calcular nuestra siguiente acción.'''
@@ -159,13 +159,14 @@ class Rabbit(Animal):
 
     def move(self, diffX, diffY, terrain):
         if diffX != 0 or diffY != 0:  #Cheking if there is movement
-            absDiffX = 0 if diffX == 0 else diffX / abs(diffX)
-            absDiffY = 0 if diffY == 0 else diffY / abs(diffY)
+            absDiffX = 0 if diffX == 0 else diffX // abs(diffX)
+            absDiffY = 0 if diffY == 0 else diffY // abs(diffY)
             if terrain[self.x + absDiffX][self.y + absDiffY][0] > ZANAHORIA:
                 diffSum = absDiffX + absDiffY
                 if diffSum == -1 or diffSum == 1:  #Moving in one axis
                     if absDiffX == 0:
-                        if terrain[self.x + 1][self.y + absDiffY][0] <= ZANAHORIA:
+                        if terrain[self.x + 1][self.y +
+                                               absDiffY][0] <= ZANAHORIA:
                             self.x += 1
                             self.y += absDiffY
                         elif terrain[self.x - 1][self.y +
@@ -173,7 +174,8 @@ class Rabbit(Animal):
                             self.x += -1
                             self.y += absDiffY
                     else:
-                        if terrain[self.x][self.y + absDiffY + 1][0] <= ZANAHORIA:
+                        if terrain[self.x][self.y + absDiffY +
+                                           1][0] <= ZANAHORIA:
                             self.x += absDiffX
                             self.y += 1
                         elif terrain[self.x][self.y + absDiffY -
@@ -190,7 +192,7 @@ class Rabbit(Animal):
                 self.x += absDiffX
                 self.y += absDiffY
 
-    def goTo(self, i, j):
+    def goTo(self, i, j, terrain):
         '''Función para ir a las coordenadas indicadas'''
 
         extra = EXTRA_STEP if self.strength_speed > numero_random_que_borraremos else 0
@@ -199,9 +201,9 @@ class Rabbit(Animal):
             diffX = i - self.x
             diffY = j - self.y
 
-            self.move(diffX, diffY)
+            self.move(diffX, diffY, terrain)
 
-        self.display()
+        self.display(terrain)
 
     def flee(self, i, j):
         '''Función para huir de las coordenadas indicadas'''
@@ -228,16 +230,22 @@ class Lynx(Animal):
         Animal.__init__(self)
         self.suffocation = 0
 
-    def display(terrain, x, y):
-        terrain[x][y] = [207, 147, 45]
+    def display(self, terrain, x, y):
+        terrain[self.x][self.y] = LINCE
 
 
 class Zanahoria():
-    def __init__(self):
-        self.x = random.randint(
-            10, 20)  #habrá que generarlas solo en zonas de hierba
-        self.y = random.randint(10, 20)
+    def __init__(self, terrain):
+
+        #we grab the indexes of the ones
+        x, y = np.where(terrain.all() > 2)
+        #we chose one index randomly
+        i = np.random.randint(len(x))
+        random_pos = [x[i], y[i]]
+
+        self.x = random_pos[0]
+        self.y = random_pos[0]
 
     def display(self, terrain):
         oldValue = terrain[self.x][self.y]
-        terrain[self.x][self.y] = [oldValue[0], ZANAHORIA]
+        terrain[self.x][self.y][1] = ZANAHORIA
