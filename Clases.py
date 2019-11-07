@@ -15,9 +15,14 @@ NADA = 0
 CONEJO = 1
 ZANAHORIA_CONEJO = 2
 ZANAHORIA = 3
-LINCE = 4
-ZANAHORIA_LINCE = 5
-CONEJO_LINCE = 6
+CONEJO_REPRODUCCION = 4
+CONEJO_CONEJO = 5
+PELEA_CONEJO = 6
+LINCE = 7
+PELEA_LINCE = 8
+ZANAHORIA_LINCE = 9
+CONEJO_LINCE = 10
+LINCE_LINCE = 11
 
 import Funciones
 from PIL import Image
@@ -43,6 +48,12 @@ class Animal:
         #Map position
         self.x = int(10)
         self.y = int(10)
+
+        self.lastX = self.x
+        self.lastY = self.y
+
+        self.wants_fight = False
+        self.wants_reproduction = False
 
     def action(self, terrain):
         self.hunger += HUNGER_LOSS
@@ -123,7 +134,7 @@ class Rabbit(Animal):
                         dist = Funciones.dist((self.x, self.y), (i, j))
 
                 elif vision_scan < ZANAHORIA_CONEJO and want_reproduction and terrain[
-                        i][j][0] == 2:
+                        i][j][0] == CONEJO:
                     if vision_scan == CONEJO:
                         auxDist = Funciones.dist((i, j), (self.x, self.y))
                         if auxDist < dist:
@@ -139,42 +150,45 @@ class Rabbit(Animal):
             elif vision_scan == NADA:
                 pass  #nos movemos random e inteligentemente
             else:
+                if vision_scan == ZANAHORIA_CONEJO:
+                    self.wants_fight = True
+                elif vision_scan == CONEJO:
+                    self.wants_reproduction = True
                 self.goTo(nearest_coord[0],
-                          nearest_coord[1])  #vamos a comer o follar
+                          nearest_coord[1])  #vamos a comer o reproducirnos
 
-        def move(self, diffX, diffY):
-            if diffX != 0 or diffY != 0:  #Cheking if there is movement
-
-                absDiffX = 0 if diffX == 0 else diffX / abs(diffX)
-                absDiffY = 0 if diffY == 0 else diffY / abs(diffY)
-                if terrain[self.x + absDiffX][self.y + absDiffY][0] > 3:
-                    diffSum = absDiffX + absDiffY
-                    if diffSum == -1 or diffSum == 1:  #Moving in one axis
-                        if absDiffX == 0:
-                            if terrain[self.x + 1][self.y + absDiffY][0] <= 3:
-                                self.x += 1
-                                self.y += absDiffY
-                            elif terrain[self.x - 1][self.y +
-                                                     absDiffY][0] <= 3:
-                                self.x += -1
-                                self.y += absDiffY
-                        else:
-                            if terrain[self.x][self.y + absDiffY + 1][0] <= 3:
-                                self.x += absDiffX
-                                self.y += 1
-                            elif terrain[self.x][self.y + absDiffY -
-                                                 1][0] <= 3:
-                                self.x += absDiffX
-                                self.y += -1
-                    else:  # Moving in two axis
-                        if terrain[self.x][self.y + absDiffY][0] <= 3:
+    def move(self, diffX, diffY, terrain):
+        if diffX != 0 or diffY != 0:  #Cheking if there is movement
+            absDiffX = 0 if diffX == 0 else diffX / abs(diffX)
+            absDiffY = 0 if diffY == 0 else diffY / abs(diffY)
+            if terrain[self.x + absDiffX][self.y + absDiffY][0] > ZANAHORIA:
+                diffSum = absDiffX + absDiffY
+                if diffSum == -1 or diffSum == 1:  #Moving in one axis
+                    if absDiffX == 0:
+                        if terrain[self.x + 1][self.y + absDiffY][0] <= ZANAHORIA:
+                            self.x += 1
                             self.y += absDiffY
-                        elif terrain[self.x + absDiffX][self.y][0] <= 3:
+                        elif terrain[self.x - 1][self.y +
+                                                 absDiffY][0] <= ZANAHORIA:
+                            self.x += -1
+                            self.y += absDiffY
+                    else:
+                        if terrain[self.x][self.y + absDiffY + 1][0] <= ZANAHORIA:
                             self.x += absDiffX
+                            self.y += 1
+                        elif terrain[self.x][self.y + absDiffY -
+                                             1][0] <= ZANAHORIA:
+                            self.x += absDiffX
+                            self.y += -1
+                else:  # Moving in two axis
+                    if terrain[self.x][self.y + absDiffY][0] <= ZANAHORIA:
+                        self.y += absDiffY
+                    elif terrain[self.x + absDiffX][self.y][0] <= ZANAHORIA:
+                        self.x += absDiffX
 
-                else:
-                    self.x += absDiffX
-                    self.y += absDiffY
+            else:
+                self.x += absDiffX
+                self.y += absDiffY
 
     def goTo(self, i, j):
         '''Función para ir a las coordenadas indicadas'''
