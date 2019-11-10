@@ -30,7 +30,7 @@ def main():
 
     while running:
 
-        if random.random() < .4:
+        if random.random() < .04:
             zanahorias.append(Clases.Zanahoria(terrain.manipulable_world))
 
         for z in zanahorias:

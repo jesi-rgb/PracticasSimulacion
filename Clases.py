@@ -236,15 +236,20 @@ class Lynx(Animal):
 
 class Zanahoria():
     def __init__(self, terrain):
+        '''
+            Carrot class and generator. Carrots are only generated where the grass is lightGreen or green.
+            
+        '''
 
-        #we grab the indexes of the ones
-        x, y = np.where(terrain.all() > 2)
-        #we chose one index randomly
+        carrotCondition = (terrain[:, :, 0] >= 2) & (terrain[:, :, 0] <= 3)
+
+        x, y = np.where(carrotCondition)
+
         i = np.random.randint(len(x))
         random_pos = [x[i], y[i]]
 
         self.x = random_pos[0]
-        self.y = random_pos[0]
+        self.y = random_pos[1]
 
     def display(self, terrain):
         oldValue = terrain[self.x][self.y]
