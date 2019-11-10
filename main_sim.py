@@ -27,6 +27,7 @@ def main():
     rabo = Clases.Rabbit()
     running = True
     zanahorias = []
+    down_pressed = None
 
     while running:
 
@@ -59,6 +60,16 @@ def main():
             if event.type == pygame.QUIT or (event.type == pygame.KEYDOWN
                                              and event.key == pygame.K_ESCAPE):
                 running = False
+
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_DOWN:
+                    down_pressed = True
+            elif event.type == pygame.KEYUP:
+                if event.key == pygame.K_DOWN:
+                    down_pressed = False
+
+        if down_pressed:
+            time.sleep(.33)
 
 
 # run the main function only if this module is executed as the main script
