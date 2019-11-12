@@ -31,11 +31,11 @@ def main():
 
     while running:
 
-        if random.random() < .04:
+        if random.random() < .4:
             zanahorias.append(Clases.Zanahoria(terrain.manipulable_world))
 
-        for z in zanahorias:
-            z.display(terrain.manipulable_world)
+        # for z in zanahorias:
+        #     z.display(terrain.manipulable_world)
 
         # conejo se mueve en manipulable world
         rabo.action(terrain.manipulable_world)

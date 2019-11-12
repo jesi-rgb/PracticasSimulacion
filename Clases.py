@@ -37,7 +37,7 @@ class Animal:
         self.hunger = 0
         self.strength_speed = 0
         self.reproductive_need = 0
-        self.vision_field = 3
+        self.vision_field = 10
         self.risk_aversion = 0
         self.racionality = 0
 
@@ -85,6 +85,11 @@ class Rabbit(Animal):
         else:
             terrain[self.x][self.y][1] = CONEJO
 
+        if not (self.x == self.lastX and self.y == self.lastY):
+            terrain[self.lastX][self.lastY][1] = 0
+            self.lastX = self.x
+            self.lastY = self.y
+
     def action(self, terrain):
         '''Función para calcular nuestra siguiente acción.'''
 
@@ -98,10 +103,11 @@ class Rabbit(Animal):
         for i in range(self.x - self.vision_field, self.x + self.vision_field):
             for j in range(self.x - self.vision_field,
                            self.x + self.vision_field):
-                if i != self.x and j != self.y:  #no nos evaluamos a nosotros mismos
+                if not (i == self.x
+                        and j == self.y):  #no nos evaluamos a nosotros mismos
 
                     #si vemos una casilla con un lince
-                    if terrain[i][j][0] >= LINCE:
+                    if terrain[i][j][1] >= LINCE:
                         if vision_scan >= LINCE:
                             auxDist = Funciones.dist((i, j), (self.x, self.y))
                             if auxDist < dist:
@@ -113,7 +119,7 @@ class Rabbit(Animal):
 
                     #si no hay linces
                     elif vision_scan < LINCE and has_hunger and terrain[i][j][
-                            0] == ZANAHORIA:
+                            1] == ZANAHORIA:
                         if vision_scan == ZANAHORIA:
                             auxDist = Funciones.dist((i, j), (self.x, self.y))
                             if auxDist < dist:
@@ -124,7 +130,7 @@ class Rabbit(Animal):
                             dist = Funciones.dist((self.x, self.y), (i, j))
 
                     elif vision_scan < ZANAHORIA and terrain[i][j][
-                            0] == ZANAHORIA_CONEJO and self.hunger * self.risk_aversion < ATTACK_LIMIT:
+                            1] == ZANAHORIA_CONEJO and self.hunger * self.risk_aversion < ATTACK_LIMIT:
                         if vision_scan == ZANAHORIA_CONEJO:
                             auxDist = Funciones.dist((i, j), (self.x, self.y))
                             if auxDist < dist:
@@ -136,7 +142,7 @@ class Rabbit(Animal):
                             dist = Funciones.dist((self.x, self.y), (i, j))
 
                     elif vision_scan < ZANAHORIA_CONEJO and want_reproduction and terrain[
-                            i][j][0] == CONEJO:
+                            i][j][1] == CONEJO:
                         if vision_scan == CONEJO:
                             auxDist = Funciones.dist((i, j), (self.x, self.y))
                             if auxDist < dist:
@@ -150,8 +156,8 @@ class Rabbit(Animal):
             if vision_scan >= LINCE:
                 self.flee(nearest_coord[0], nearest_coord[1])
             elif vision_scan == NADA:
-                pass  #nos movemos random e inteligentemente
-                print("NADA")
+                self.moveRandom(terrain)
+                # print("NADA")
             else:
                 print("CONEJO")
                 if vision_scan == ZANAHORIA_CONEJO:
@@ -162,7 +168,18 @@ class Rabbit(Animal):
                           terrain)  #vamos a comer o reproducirnos
 
     def moveRandom(self, terrain):
-        pass
+        random_eje_x = random.randint(-1, 1)
+        random_eje_y = random.randint(-1, 1)
+
+        extra = EXTRA_STEP if self.strength_speed > numero_random_que_borraremos else 0
+
+        for _ in range(MOVES_PER_ACTION + extra):
+            diffX = random_eje_x
+            diffY = random_eje_y
+
+            self.move(diffX, diffY, terrain)
+
+        self.display(terrain)
 
     def move(self, diffX, diffY, terrain):
         if diffX != 0 or diffY != 0:  #Checking if there is movement
@@ -246,10 +263,10 @@ class Zanahoria():
     def __init__(self, terrain):
         '''
             Carrot class and generator. Carrots are only generated where the grass is lightGreen or green.
-
         '''
 
-        carrotCondition = (terrain[:, :, 0] >= 2) & (terrain[:, :, 0] <= 3)
+        carrotCondition = (terrain[:, :, 1] == 0) & (terrain[:, :, 0] >= 2) & (
+            terrain[:, :, 0] <= 3)
 
         x, y = np.where(carrotCondition)
 
@@ -259,6 +276,4 @@ class Zanahoria():
         self.x = random_pos[0]
         self.y = random_pos[1]
 
-    def display(self, terrain):
-        oldValue = terrain[self.x][self.y]
         terrain[self.x][self.y][1] = ZANAHORIA
