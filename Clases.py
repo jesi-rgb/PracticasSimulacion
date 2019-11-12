@@ -46,8 +46,8 @@ class Animal:
         self.time_alive = 0
 
         #Map position
-        self.x = int(20)
-        self.y = int(20)
+        self.x = int(50)
+        self.y = int(50)
 
         self.lastX = self.x
         self.lastY = self.y
@@ -81,7 +81,6 @@ class Rabbit(Animal):
             pass  #ahora es pelea
 
         if terrain[self.x][self.y][1] == ZANAHORIA:
-            print("zanahoria conejo")
             terrain[self.x][self.y][1] = ZANAHORIA_CONEJO
         else:
             terrain[self.x][self.y][1] = CONEJO
@@ -103,12 +102,12 @@ class Rabbit(Animal):
         want_reproduction = self.reproductive_need < REPRODUCTIONH_FEELING_LIMIT
         vision_scan, nearest_coord = NADA, (None, None)
         dist = None
+        print(self.x, "pitos", self.y)
         for i in range(self.x - self.vision_field, self.x + self.vision_field):
-            for j in range(self.x - self.vision_field,
-                           self.x + self.vision_field):
+            for j in range(self.y - self.vision_field,
+                           self.y + self.vision_field):
                 if not (i == self.x
                         and j == self.y):  #no nos evaluamos a nosotros mismos
-
                     #si vemos una casilla con un lince
                     if terrain[i][j][1] >= LINCE:
                         if vision_scan >= LINCE:
@@ -125,10 +124,12 @@ class Rabbit(Animal):
                             1] == ZANAHORIA:
                         if vision_scan == ZANAHORIA:
                             auxDist = Funciones.dist((i, j), (self.x, self.y))
+                            print('ZANAHORIA')
                             if auxDist < dist:
                                 dist = auxDist
                                 nearest_coord = (i, j)
                         else:
+                            print('ZANAHORIA1212')
                             vision_scan, nearest_coord = ZANAHORIA, (i, j)
                             dist = Funciones.dist((self.x, self.y), (i, j))
 
@@ -156,20 +157,20 @@ class Rabbit(Animal):
                             vision_scan, nearest_coord = CONEJO, (i, j)
                             dist = Funciones.dist((self.x, self.y), (i, j))
 
-            #veredicto final vision_scan
-            if vision_scan >= LINCE:
-                self.flee(nearest_coord[0], nearest_coord[1])
-            elif vision_scan == NADA:
-                self.moveRandom(terrain)
-                # print("NADA")
-            else:
-                print('vision scan', vision_scan)
-                if vision_scan == ZANAHORIA_CONEJO:
-                    self.wants_fight = True
-                elif vision_scan == CONEJO:
-                    self.wants_reproduction = True
-                self.goTo(nearest_coord[0], nearest_coord[1],
-                          terrain)  #vamos a comer o reproducirnos
+        #veredicto final vision_scan
+        if vision_scan >= LINCE:
+            self.flee(nearest_coord[0], nearest_coord[1])
+        elif vision_scan == NADA:
+            self.moveRandom(terrain)
+            # print("NADA")
+        else:
+            print('vision scan', vision_scan)
+            if vision_scan == ZANAHORIA_CONEJO:
+                self.wants_fight = True
+            elif vision_scan == CONEJO:
+                self.wants_reproduction = True
+            self.goTo(nearest_coord[0], nearest_coord[1],
+                      terrain)  #vamos a comer o reproducirnos
 
     def moveRandom(self, terrain):
         random_eje_x = random.randint(-1, 1)
