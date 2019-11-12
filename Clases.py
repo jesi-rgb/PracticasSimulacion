@@ -46,8 +46,8 @@ class Animal:
         self.time_alive = 0
 
         #Map position
-        self.x = int(50)
-        self.y = int(50)
+        self.x = int(20)
+        self.y = int(20)
 
         self.lastX = self.x
         self.lastY = self.y
@@ -81,6 +81,7 @@ class Rabbit(Animal):
             pass  #ahora es pelea
 
         if terrain[self.x][self.y][1] == ZANAHORIA:
+            print("zanahoria conejo")
             terrain[self.x][self.y][1] = ZANAHORIA_CONEJO
         else:
             terrain[self.x][self.y][1] = CONEJO
@@ -89,6 +90,8 @@ class Rabbit(Animal):
             terrain[self.lastX][self.lastY][1] = 0
             self.lastX = self.x
             self.lastY = self.y
+
+        # print('x', self.x, 'y', self.y)
 
     def action(self, terrain):
         '''Función para calcular nuestra siguiente acción.'''
@@ -143,6 +146,7 @@ class Rabbit(Animal):
 
                     elif vision_scan < ZANAHORIA_CONEJO and want_reproduction and terrain[
                             i][j][1] == CONEJO:
+                        print(nearest_coord)
                         if vision_scan == CONEJO:
                             auxDist = Funciones.dist((i, j), (self.x, self.y))
                             if auxDist < dist:
@@ -159,7 +163,7 @@ class Rabbit(Animal):
                 self.moveRandom(terrain)
                 # print("NADA")
             else:
-                print("CONEJO")
+                print('vision scan', vision_scan)
                 if vision_scan == ZANAHORIA_CONEJO:
                     self.wants_fight = True
                 elif vision_scan == CONEJO:
@@ -185,31 +189,31 @@ class Rabbit(Animal):
         if diffX != 0 or diffY != 0:  #Checking if there is movement
             absDiffX = 0 if diffX == 0 else diffX // abs(diffX)
             absDiffY = 0 if diffY == 0 else diffY // abs(diffY)
-            if terrain[self.x + absDiffX][self.y + absDiffY][0] > ZANAHORIA:
+            if terrain[self.x + absDiffX][self.y + absDiffY][1] > ZANAHORIA:
                 diffSum = absDiffX + absDiffY
                 if diffSum == -1 or diffSum == 1:  #Moving in one axis
                     if absDiffX == 0:
                         if terrain[self.x + 1][self.y +
-                                               absDiffY][0] <= ZANAHORIA:
+                                               absDiffY][1] <= ZANAHORIA:
                             self.x += 1
                             self.y += absDiffY
                         elif terrain[self.x - 1][self.y +
-                                                 absDiffY][0] <= ZANAHORIA:
+                                                 absDiffY][1] <= ZANAHORIA:
                             self.x += -1
                             self.y += absDiffY
                     else:
                         if terrain[self.x][self.y + absDiffY +
-                                           1][0] <= ZANAHORIA:
+                                           1][1] <= ZANAHORIA:
                             self.x += absDiffX
                             self.y += 1
                         elif terrain[self.x][self.y + absDiffY -
-                                             1][0] <= ZANAHORIA:
+                                             1][1] <= ZANAHORIA:
                             self.x += absDiffX
                             self.y += -1
                 else:  # Moving in two axis
-                    if terrain[self.x][self.y + absDiffY][0] <= ZANAHORIA:
+                    if terrain[self.x][self.y + absDiffY][1] <= ZANAHORIA:
                         self.y += absDiffY
-                    elif terrain[self.x + absDiffX][self.y][0] <= ZANAHORIA:
+                    elif terrain[self.x + absDiffX][self.y][1] <= ZANAHORIA:
                         self.x += absDiffX
 
             else:

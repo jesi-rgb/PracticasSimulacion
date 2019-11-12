@@ -39,6 +39,7 @@ def main():
 
         # conejo se mueve en manipulable world
         rabo.action(terrain.manipulable_world)
+        # rabo.goTo(200, 200, terrain.manipulable_world)
 
         # generamos terrain.world from manipulable world
         terrain.recalculate_world()

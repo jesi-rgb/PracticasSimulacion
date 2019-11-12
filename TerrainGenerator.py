@@ -116,6 +116,8 @@ class Terrain:
         bunnyCondition = self.manipulable_world == [int, CONEJO]
         carrotCondition = self.manipulable_world == [int, ZANAHORIA]
 
+        # print('cont connejos:', np.count_nonzero(bunnyCondition))
+
         bunnyCondition = bunnyCondition[:, :, 1]
         carrotCondition = carrotCondition[:, :, 1]
 
