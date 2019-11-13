@@ -1,7 +1,7 @@
 import noise
 import numpy as np
 from PIL import Image
-from Clases import CONEJO, LINCE, ZANAHORIA
+from Clases import CONEJO, LINCE, ZANAHORIA, ZANAHORIA_CONEJO
 
 
 class Terrain:
@@ -98,51 +98,48 @@ class Terrain:
         color_world[mountainCondition] = self.mountain
         color_world[snowCondition] = self.snow
 
-        self.manipulable_world[blueCondition] = (0, 0)
-        self.manipulable_world[beachCondition] = (1, 0)
-        self.manipulable_world[lightGreenCondition] = (2, 0)
-        self.manipulable_world[greenCondition] = (3, 0)
-        self.manipulable_world[darkGreenCondition] = (4, 0)
-        self.manipulable_world[mountainCondition] = (5, 0)
-        self.manipulable_world[snowCondition] = (6, 0)
+        self.manipulable_world[blueCondition] = [0, 0]
+        self.manipulable_world[beachCondition] = [1, 0]
+        self.manipulable_world[lightGreenCondition] = [2, 0]
+        self.manipulable_world[greenCondition] = [3, 0]
+        self.manipulable_world[darkGreenCondition] = [4, 0]
+        self.manipulable_world[mountainCondition] = [5, 0]
+        self.manipulable_world[snowCondition] = [6, 0]
 
         self.world = color_world
         # np.save("world", self.world)
         # np.save("manipulable_world", self.manipulable_world)
-        self.original_world = np.copy(self.manipulable_world)
+        # self.original_world = np.copy(self.manipulable_world)
 
     def recalculate_world(self):
         '''Función para recalcular el mundo en base a la posición nueva que toman los animales'''
-        bunnyCondition = self.manipulable_world == [int, CONEJO]
-        carrotCondition = self.manipulable_world == [int, ZANAHORIA]
-
-        # print('cont connejos:', np.count_nonzero(bunnyCondition))
-
-        bunnyCondition = bunnyCondition[:, :, 1]
-        carrotCondition = carrotCondition[:, :, 1]
+        bunnyCondition = self.manipulable_world[:, :, 1] == CONEJO
+        carrotCondition = self.manipulable_world[:, :, 1] == ZANAHORIA
+        eatingCondition = self.manipulable_world[:, :, 1] == ZANAHORIA_CONEJO
 
         self.world[bunnyCondition] = self.white
         self.world[carrotCondition] = self.orange
+        self.world[eatingCondition] = [255, 80, 80]
 
     def reset_worlds(self):
         '''Función para resetear ambos mundos y prepararlos para el siguiente tick'''
-        self.manipulable_world = self.original_world
+        # self.manipulable_world = np.copy(self.original_world)
 
-        blueCondition = self.manipulable_world == [0, int]
-        beachCondition = self.manipulable_world == [1, int]
-        lightGreenCondition = self.manipulable_world == [2, int]
-        greenCondition = self.manipulable_world == [3, int]
-        darkGreenCondition = self.manipulable_world == [4, int]
-        mountainCondition = self.manipulable_world == [5, int]
-        snowCondition = self.manipulable_world == [6, int]
+        blueCondition = self.manipulable_world[:, :, 0] == 0
+        beachCondition = self.manipulable_world[:, :, 0] == 1
+        lightGreenCondition = self.manipulable_world[:, :, 0] == 2
+        greenCondition = self.manipulable_world[:, :, 0] == 3
+        darkGreenCondition = self.manipulable_world[:, :, 0] == 4
+        mountainCondition = self.manipulable_world[:, :, 0] == 5
+        snowCondition = self.manipulable_world[:, :, 0] == 6
 
-        self.world[blueCondition[:, :, 0]] = self.blue
-        self.world[beachCondition[:, :, 0]] = self.beach
-        self.world[lightGreenCondition[:, :, 0]] = self.lightGreen
-        self.world[greenCondition[:, :, 0]] = self.green
-        self.world[darkGreenCondition[:, :, 0]] = self.darkGreen
-        self.world[mountainCondition[:, :, 0]] = self.mountain
-        self.world[snowCondition[:, :, 0]] = self.snow
+        self.world[blueCondition] = self.blue
+        self.world[beachCondition] = self.beach
+        self.world[lightGreenCondition] = self.lightGreen
+        self.world[greenCondition] = self.green
+        self.world[darkGreenCondition] = self.darkGreen
+        self.world[mountainCondition] = self.mountain
+        self.world[snowCondition] = self.snow
 
 
 if __name__ == "__main__":

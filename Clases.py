@@ -4,7 +4,7 @@ REPRODUCTIONH_FEELING_LIMIT = 0.5
 ATTACK_LIMIT = 0.1
 MIN_SPEED = 5
 MAX_SPEED = 20
-EAT_DELAY = 2  #ticks
+EAT_DELAY = 4  #ticks
 HUNGER_QUENCH = 0.3
 MOVES_PER_ACTION = 1
 EXTRA_STEP = 1
@@ -37,7 +37,7 @@ class Animal:
         self.hunger = 0
         self.strength_speed = 0
         self.reproductive_need = 0
-        self.vision_field = 10
+        self.vision_field = 5
         self.risk_aversion = 0
         self.racionality = 0
 
@@ -56,8 +56,6 @@ class Animal:
         self.wants_reproduction = False
 
         self.eat_ticks = 0
-
-
 
     def action(self, terrain):
         self.hunger += HUNGER_LOSS
@@ -86,7 +84,7 @@ class Rabbit(Animal):
         elif terrain[self.x][self.y][1] == ZANAHORIA:
             terrain[self.x][self.y][1] = ZANAHORIA_CONEJO
         elif terrain[self.x][self.y][1] == CONEJO:
-            pass #reproduccion
+            pass  #reproduccion
         else:
             terrain[self.x][self.y][1] = CONEJO
 
@@ -100,7 +98,7 @@ class Rabbit(Animal):
     def action(self, terrain):
         '''Función para calcular nuestra siguiente acción.'''
 
-        #Animal.action(self, terrain)
+        # Animal.action(self, terrain)
 
         if terrain[self.x][self.y][1] == ZANAHORIA_CONEJO:
             self.eat(terrain)
@@ -109,9 +107,9 @@ class Rabbit(Animal):
         elif terrain[self.x][self.y][1] == CONEJO_CONEJO:
             pass
         elif terrain[self.x][self.y][1] == PELEA_CONEJO:
-            pass #reiniciar eat_ticks
+            pass  #reiniciar eat_ticks
         elif terrain[self.x][self.y][1] == CONEJO_LINCE:
-            pass #reiniciar eat_ticks del conejo
+            pass  #reiniciar eat_ticks del conejo
         else:
 
             #Check map with vision_field
@@ -119,15 +117,17 @@ class Rabbit(Animal):
             want_reproduction = self.reproductive_need < REPRODUCTIONH_FEELING_LIMIT
             vision_scan, nearest_coord = NADA, (None, None)
             dist = None
-            for i in range(self.x - self.vision_field, self.x + self.vision_field):
+            for i in range(self.x - self.vision_field,
+                           self.x + self.vision_field):
                 for j in range(self.y - self.vision_field,
                                self.y + self.vision_field):
-                    if not (i == self.x
-                            and j == self.y):  #no nos evaluamos a nosotros mismos
+                    if not (i == self.x and
+                            j == self.y):  #no nos evaluamos a nosotros mismos
                         #si vemos una casilla con un lince
                         if terrain[i][j][1] >= LINCE:
                             if vision_scan >= LINCE:
-                                auxDist = Funciones.dist((i, j), (self.x, self.y))
+                                auxDist = Funciones.dist((i, j),
+                                                         (self.x, self.y))
                                 if auxDist < dist:
                                     dist = auxDist
                                     nearest_coord = (i, j)
@@ -136,10 +136,11 @@ class Rabbit(Animal):
                                 dist = Funciones.dist((self.x, self.y), (i, j))
 
                         #si no hay linces
-                        elif (vision_scan < LINCE) and (has_hunger) and (terrain[i][j][
-                                1] == ZANAHORIA):
+                        elif (vision_scan < LINCE) and (has_hunger) and (
+                                terrain[i][j][1] == ZANAHORIA):
                             if vision_scan == ZANAHORIA:
-                                auxDist = Funciones.dist((i, j), (self.x, self.y))
+                                auxDist = Funciones.dist((i, j),
+                                                         (self.x, self.y))
                                 if auxDist < dist:
                                     dist = auxDist
                                     nearest_coord = (i, j)
@@ -150,20 +151,22 @@ class Rabbit(Animal):
                         elif vision_scan < ZANAHORIA and terrain[i][j][
                                 1] == ZANAHORIA_CONEJO and self.hunger * self.risk_aversion < ATTACK_LIMIT:
                             if vision_scan == ZANAHORIA_CONEJO:
-                                auxDist = Funciones.dist((i, j), (self.x, self.y))
+                                auxDist = Funciones.dist((i, j),
+                                                         (self.x, self.y))
                                 if auxDist < dist:
                                     dist = auxDist
                                     nearest_coord = (i, j)
                             else:
-                                vision_scan, nearest_coord = ZANAHORIA_CONEJO, (i,
-                                                                                j)
+                                vision_scan, nearest_coord = ZANAHORIA_CONEJO, (
+                                    i, j)
                                 dist = Funciones.dist((self.x, self.y), (i, j))
 
                         elif vision_scan < ZANAHORIA_CONEJO and want_reproduction and terrain[
                                 i][j][1] == CONEJO:
                             print(nearest_coord)
                             if vision_scan == CONEJO:
-                                auxDist = Funciones.dist((i, j), (self.x, self.y))
+                                auxDist = Funciones.dist((i, j),
+                                                         (self.x, self.y))
                                 if auxDist < dist:
                                     dist = auxDist
                                     nearest_coord = (i, j)
@@ -204,7 +207,8 @@ class Rabbit(Animal):
             absDiffX = 0 if diffX == 0 else diffX // abs(diffX)
             absDiffY = 0 if diffY == 0 else diffY // abs(diffY)
             if self.wants_fight:
-                if terrain[self.x + absDiffX][self.y + absDiffY][1] > ZANAHORIA:
+                if terrain[self.x + absDiffX][self.y +
+                                              absDiffY][1] > ZANAHORIA:
                     diffSum = absDiffX + absDiffY
                     if diffSum == -1 or diffSum == 1:  #Moving in one axis
                         if absDiffX == 0:
@@ -228,7 +232,8 @@ class Rabbit(Animal):
                     else:  # Moving in two axis
                         if terrain[self.x][self.y + absDiffY][1] <= ZANAHORIA:
                             self.y += absDiffY
-                        elif terrain[self.x + absDiffX][self.y][1] <= ZANAHORIA:
+                        elif terrain[self.x +
+                                     absDiffX][self.y][1] <= ZANAHORIA:
                             self.x += absDiffX
 
                 else:
@@ -272,7 +277,7 @@ class Rabbit(Animal):
     def goTo(self, i, j, terrain):
         '''Función para ir a las coordenadas indicadas'''
         print("going to:", i, " ", j)
-        print("we are in:",self.x, self.y)
+        print("we are in:", self.x, self.y)
         extra = EXTRA_STEP if self.strength_speed > numero_random_que_borraremos else 0
 
         for _ in range(MOVES_PER_ACTION + extra):
@@ -298,7 +303,7 @@ class Rabbit(Animal):
         if self.eat_ticks == EAT_DELAY:
             self.eat_ticks = 0
             self.hunger -= HUNGER_QUENCH
-            terrain[self.x][self.y] = CONEJO  #solo estoy yo
+            terrain[self.x][self.y][1] = CONEJO  #solo estoy yo
 
     def attack(self):
         pass
@@ -313,7 +318,7 @@ class Lynx(Animal):
         self.suffocation = 0
 
     def display(self, terrain, x, y):
-        terrain[self.x][self.y] = LINCE
+        terrain[self.x][self.y][1] = LINCE
 
 
 class Zanahoria():

@@ -8,8 +8,8 @@ import time, random, numpy as np
 # define a main function
 def main():
     width, height = 800, 800
-    w_factor = 4
-    h_factor = 4
+    w_factor = 10
+    h_factor = 10
 
     terrain = Terrain((width // w_factor, height // h_factor), 100.0, 22.55,
                       89.55, 6, 0.45, 2)
@@ -26,16 +26,11 @@ def main():
 
     rabo = Clases.Rabbit()
     running = True
-    zanahorias = []
     down_pressed = None
 
     while running:
-
         if random.random() < 4:
-            zanahorias.append(Clases.Zanahoria(terrain.manipulable_world))
-
-        # for z in zanahorias:
-        #     z.display(terrain.manipulable_world)
+            Clases.Zanahoria(terrain.manipulable_world)
 
         # conejo se mueve en manipulable world
         rabo.action(terrain.manipulable_world)
