@@ -24,16 +24,18 @@ def main():
 
     screen = pygame.display.set_mode((width, height))
 
-    rabo = Clases.Rabbit()
+    rabo = Clases.Rabbit(50, 50)
+    rabo2 = Clases.Rabbit(30, 30)
     running = True
     down_pressed = None
 
     while running:
-        if random.random() < 4:
+        if random.random() < 0.1:
             Clases.Zanahoria(terrain.manipulable_world)
 
         # conejo se mueve en manipulable world
         rabo.action(terrain.manipulable_world)
+        rabo2.action(terrain.manipulable_world)
         # rabo.goTo(200, 200, terrain.manipulable_world)
 
         # generamos terrain.world from manipulable world

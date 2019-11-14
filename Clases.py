@@ -24,6 +24,9 @@ ZANAHORIA_LINCE = 9
 CONEJO_LINCE = 10
 LINCE_LINCE = 11
 
+#Estructuras de datos
+rabbit_fight_dict = dict()
+
 import Funciones
 from PIL import Image
 import numpy as np
@@ -31,7 +34,7 @@ import random
 
 
 class Animal:
-    def __init__(self):
+    def __init__(self, x, y):
 
         #Survival attributes
         self.hunger = 0
@@ -46,8 +49,8 @@ class Animal:
         self.time_alive = 0
 
         #Map position
-        self.x = int(50)
-        self.y = int(50)
+        self.x = x
+        self.y = y
 
         self.lastX = self.x
         self.lastY = self.y
@@ -72,15 +75,16 @@ class Animal:
 
 
 class Rabbit(Animal):
-    def __init__(self):
-        Animal.__init__(self)
+    def __init__(self, x, y):
+        Animal.__init__(self, x, y)
 
     def display(self, terrain):
         '''Función para editar el valor x, y del mundo donde nos situamos ahora mismo'''
         # oldValue = terrain[self.x][self.y]
         # terrain[self.x][self.y] = [oldValue[0], CONEJO]
         if terrain[self.x][self.y][1] == ZANAHORIA_CONEJO:
-            pass  #ahora es pelea
+            terrain[self.x][self.y][1] = PELEA_CONEJO
+            rabbit_fight_dict[str(self.x)+"-"+str(self.y)] = self.strength_speed * numero_random_que_borraremos
         elif terrain[self.x][self.y][1] == ZANAHORIA:
             terrain[self.x][self.y][1] = ZANAHORIA_CONEJO
         elif terrain[self.x][self.y][1] == CONEJO:
@@ -98,7 +102,8 @@ class Rabbit(Animal):
     def action(self, terrain):
         '''Función para calcular nuestra siguiente acción.'''
 
-        # Animal.action(self, terrain)
+        #Ponerlo al final
+        Animal.action(self, terrain)
 
         if terrain[self.x][self.y][1] == ZANAHORIA_CONEJO:
             self.eat(terrain)
@@ -107,13 +112,25 @@ class Rabbit(Animal):
         elif terrain[self.x][self.y][1] == CONEJO_CONEJO:
             pass
         elif terrain[self.x][self.y][1] == PELEA_CONEJO:
-            pass  #reiniciar eat_ticks
+            if rabbit_fight_dict[str(self.x)+"-"+str(self.y)] == None:
+                terrain[self.x][self.y][1] = ZANAHORIA_CONEJO
+                self.eat(terrain)
+            elif rabbit_fight_dict[str(self.x)+"-"+str(self.y)] \
+                    > self.strength_speed * numero_random_que_borraremos: #El menor gana
+                terrain[self.x][self.y][1] = ZANAHORIA_CONEJO
+                self.eat(terrain)
+            else:
+                rabbit_fight_dict[str(self.x)+"-"+str(self.y)] = None
+                terrain[self.x][self.y][1] = ZANAHORIA_CONEJO
+                #Die
+                print("muero :(")
+
         elif terrain[self.x][self.y][1] == CONEJO_LINCE:
-            pass  #reiniciar eat_ticks del conejo
+            pass
         else:
 
             #Check map with vision_field
-            has_hunger = self.hunger < HUNGER_FEELING_LIMIT
+            has_hunger = self.hunger > HUNGER_FEELING_LIMIT
             want_reproduction = self.reproductive_need < REPRODUCTIONH_FEELING_LIMIT
             vision_scan, nearest_coord = NADA, (None, None)
             dist = None
@@ -163,7 +180,6 @@ class Rabbit(Animal):
 
                         elif vision_scan < ZANAHORIA_CONEJO and want_reproduction and terrain[
                                 i][j][1] == CONEJO:
-                            print(nearest_coord)
                             if vision_scan == CONEJO:
                                 auxDist = Funciones.dist((i, j),
                                                          (self.x, self.y))
@@ -276,8 +292,6 @@ class Rabbit(Animal):
 
     def goTo(self, i, j, terrain):
         '''Función para ir a las coordenadas indicadas'''
-        print("going to:", i, " ", j)
-        print("we are in:", self.x, self.y)
         extra = EXTRA_STEP if self.strength_speed > numero_random_que_borraremos else 0
 
         for _ in range(MOVES_PER_ACTION + extra):
@@ -298,7 +312,6 @@ class Rabbit(Animal):
         self.goTo(i + diffX, j + diffY)
 
     def eat(self, terrain):
-        print("Eating")
         self.eat_ticks += 1
         if self.eat_ticks == EAT_DELAY:
             self.eat_ticks = 0
