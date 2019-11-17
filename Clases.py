@@ -112,12 +112,12 @@ class Rabbit(Animal):
         if terrain[self.x][self.y][1] == ZANAHORIA_CONEJO:
             self.eat(terrain)
         elif terrain[self.x][self.y][1] == CONEJO_REPRODUCCION and self.reproductive_need < REPRODUCTIONH_FEELING_LIMIT:
-            if rabbit_fight_dict[str(self.x)+"-"+str(self.y)] == None:
+            if rabbit_reproduction_dict[str(self.x)+"-"+str(self.y)] == None:
                 terrain[self.x][self.y][1] == CONEJO_CONEJO
                 self.reproductive_need = 1
             else:
-                self.reproduce(terrain, terrain, rabbit_dict)
-                rabbit_fight_dict[str(self.x)+"-"+str(self.y)] = None
+                self.reproduce(terrain, rabbit_dict)
+                rabbit_reproduction_dict[str(self.x)+"-"+str(self.y)] = None
         elif terrain[self.x][self.y][1] == PELEA_CONEJO:
             if rabbit_fight_dict[str(self.x)+"-"+str(self.y)] == None: #Ganaste tu
                 terrain[self.x][self.y][1] = ZANAHORIA_CONEJO
@@ -341,7 +341,7 @@ class Rabbit(Animal):
         aux_j = 0
         for i in range(-1,1):
             for j in range(-1,1):
-                if terrain[self.x+aux_i][self.j+aux_j][1] == NADA:
+                if terrain[self.x+aux_i][self.y+aux_j][1] == NADA:
                     aux_i = i
                     aux_j = j
                     exit
