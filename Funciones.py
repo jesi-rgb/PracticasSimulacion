@@ -1,5 +1,8 @@
 import math
 
+WIDTH, HEIGTH = 800, 800
+W_FACTOR = 10
+H_FACTOR = 10
 
 def dist(position, target):
     '''Devuelve la distancia euclidea de las dos coordenadas'''
