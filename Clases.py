@@ -109,114 +109,114 @@ class Rabbit(Animal):
     def action(self, terrain, rabbit_dict):
         '''Función para calcular nuestra siguiente acción.'''
 
-        if terrain[self.x][self.y][1] == ZANAHORIA_CONEJO:
-            self.eat(terrain)
-        elif terrain[self.x][self.y][1] == CONEJO_REPRODUCCION and self.reproductive_need < REPRODUCTIONH_FEELING_LIMIT:
-            if rabbit_fight_dict[str(self.x)+"-"+str(self.y)] == None:
-                terrain[self.x][self.y][1] == CONEJO_CONEJO
-                self.reproductive_need = 1
-            else:
-                self.reproduce(terrain, terrain, rabbit_dict)
-                rabbit_fight_dict[str(self.x)+"-"+str(self.y)] = None
-        elif terrain[self.x][self.y][1] == PELEA_CONEJO:
-            if rabbit_fight_dict[str(self.x)+"-"+str(self.y)] == None: #Ganaste tu
-                terrain[self.x][self.y][1] = ZANAHORIA_CONEJO
-                self.eat(terrain)
-                del rabbit_fight_dict[str(self.x)+"-"+str(self.y)]
-            elif rabbit_fight_dict[str(self.x)+"-"+str(self.y)] == False: #Gana el
-                self.die(terrain, rabbit_dict)
-                del rabbit_fight_dict[str(self.x)+"-"+str(self.y)]
-            elif rabbit_fight_dict[str(self.x)+"-"+str(self.y)] \
-                    > self.strength_speed * numero_random_que_borraremos: #El menor gana - Ganamos nosotros
-                rabbit_fight_dict[str(self.x)+"-"+str(self.y)] = False
-                self.eat(terrain)
-            else:
-                rabbit_fight_dict[str(self.x)+"-"+str(self.y)] = None #Gana el
-                self.die(terrain, rabbit_dict)
+        # if terrain[self.x][self.y][1] == ZANAHORIA_CONEJO:
+        #     self.eat(terrain)
+        # elif terrain[self.x][self.y][1] == CONEJO_REPRODUCCION and self.reproductive_need < REPRODUCTIONH_FEELING_LIMIT:
+        #     if rabbit_fight_dict[str(self.x)+"-"+str(self.y)] == None:
+        #         terrain[self.x][self.y][1] == CONEJO_CONEJO
+        #         self.reproductive_need = 1
+        #     else:
+        #         self.reproduce(terrain, terrain, rabbit_dict)
+        #         rabbit_fight_dict[str(self.x)+"-"+str(self.y)] = None
+        # elif terrain[self.x][self.y][1] == PELEA_CONEJO:
+        #     if rabbit_fight_dict[str(self.x)+"-"+str(self.y)] == None: #Ganaste tu
+        #         terrain[self.x][self.y][1] = ZANAHORIA_CONEJO
+        #         self.eat(terrain)
+        #         del rabbit_fight_dict[str(self.x)+"-"+str(self.y)]
+        #     elif rabbit_fight_dict[str(self.x)+"-"+str(self.y)] == False: #Gana el
+        #         self.die(terrain, rabbit_dict)
+        #         del rabbit_fight_dict[str(self.x)+"-"+str(self.y)]
+        #     elif rabbit_fight_dict[str(self.x)+"-"+str(self.y)] \
+        #             > self.strength_speed * numero_random_que_borraremos: #El menor gana - Ganamos nosotros
+        #         rabbit_fight_dict[str(self.x)+"-"+str(self.y)] = False
+        #         self.eat(terrain)
+        #     else:
+        #         rabbit_fight_dict[str(self.x)+"-"+str(self.y)] = None #Gana el
+        #         self.die(terrain, rabbit_dict)
 
-        elif terrain[self.x][self.y][1] == CONEJO_LINCE:
-            pass
-        elif self.hunger >= 1:
-            self.die(terrain, rabbit_dict)
+        # elif terrain[self.x][self.y][1] == CONEJO_LINCE:
+        #     pass
+        # elif self.hunger >= 1:
+        #     self.die(terrain, rabbit_dict)
+        # else:
+
+        #Check map with vision_field
+        has_hunger = self.hunger > HUNGER_FEELING_LIMIT
+        want_reproduction = self.reproductive_need < REPRODUCTIONH_FEELING_LIMIT
+        vision_scan, nearest_coord = NADA, (None, None)
+        dist = None
+        for i in range(self.x - self.vision_field,
+                        self.x + self.vision_field):
+            for j in range(self.y - self.vision_field,
+                            self.y + self.vision_field):
+                if not (i == self.x and
+                        j == self.y):  #no nos evaluamos a nosotros mismos
+                    #si vemos una casilla con un lince
+                    if terrain[i][j][1] >= LINCE:
+                        if vision_scan >= LINCE:
+                            auxDist = Funciones.dist((i, j),
+                                                        (self.x, self.y))
+                            if auxDist < dist:
+                                dist = auxDist
+                                nearest_coord = (i, j)
+                        else:
+                            vision_scan, nearest_coord = LINCE, (i, j)
+                            dist = Funciones.dist((self.x, self.y), (i, j))
+
+                    #si no hay linces
+                    elif (vision_scan < LINCE) and (has_hunger) and (
+                            terrain[i][j][1] == ZANAHORIA):
+                        if vision_scan == ZANAHORIA:
+                            auxDist = Funciones.dist((i, j),
+                                                        (self.x, self.y))
+                            if auxDist < dist:
+                                dist = auxDist
+                                nearest_coord = (i, j)
+                        else:
+                            vision_scan, nearest_coord = ZANAHORIA, (i, j)
+                            dist = Funciones.dist((self.x, self.y), (i, j))
+
+                    elif vision_scan < ZANAHORIA and terrain[i][j][
+                            1] == ZANAHORIA_CONEJO and self.hunger * self.risk_aversion < ATTACK_LIMIT:
+                        if vision_scan == ZANAHORIA_CONEJO:
+                            auxDist = Funciones.dist((i, j),
+                                                        (self.x, self.y))
+                            if auxDist < dist:
+                                dist = auxDist
+                                nearest_coord = (i, j)
+                        else:
+                            vision_scan, nearest_coord = ZANAHORIA_CONEJO, (
+                                i, j)
+                            dist = Funciones.dist((self.x, self.y), (i, j))
+
+                    elif vision_scan < ZANAHORIA_CONEJO and want_reproduction and terrain[
+                            i][j][1] == CONEJO:
+                        if vision_scan == CONEJO:
+                            auxDist = Funciones.dist((i, j),
+                                                        (self.x, self.y))
+                            if auxDist < dist:
+                                dist = auxDist
+                                nearest_coord = (i, j)
+                        else:
+                            vision_scan, nearest_coord = CONEJO, (i, j)
+                            dist = Funciones.dist((self.x, self.y), (i, j))
+
+        #veredicto final vision_scan
+        if vision_scan >= LINCE:
+            self.flee(nearest_coord[0], nearest_coord[1])
+        elif vision_scan == NADA:
+            self.moveRandom(terrain)
+            # print("NADA")
         else:
+            if vision_scan == ZANAHORIA_CONEJO:
+                self.wants_fight = True
+            elif vision_scan == CONEJO:
+                self.wants_reproduction = True
+            self.goTo(nearest_coord[0], nearest_coord[1],
+                        terrain)  #vamos a comer o reproducirnos
 
-            #Check map with vision_field
-            has_hunger = self.hunger > HUNGER_FEELING_LIMIT
-            want_reproduction = self.reproductive_need < REPRODUCTIONH_FEELING_LIMIT
-            vision_scan, nearest_coord = NADA, (None, None)
-            dist = None
-            for i in range(self.x - self.vision_field,
-                           self.x + self.vision_field):
-                for j in range(self.y - self.vision_field,
-                               self.y + self.vision_field):
-                    if not (i == self.x and
-                            j == self.y):  #no nos evaluamos a nosotros mismos
-                        #si vemos una casilla con un lince
-                        if terrain[i][j][1] >= LINCE:
-                            if vision_scan >= LINCE:
-                                auxDist = Funciones.dist((i, j),
-                                                         (self.x, self.y))
-                                if auxDist < dist:
-                                    dist = auxDist
-                                    nearest_coord = (i, j)
-                            else:
-                                vision_scan, nearest_coord = LINCE, (i, j)
-                                dist = Funciones.dist((self.x, self.y), (i, j))
-
-                        #si no hay linces
-                        elif (vision_scan < LINCE) and (has_hunger) and (
-                                terrain[i][j][1] == ZANAHORIA):
-                            if vision_scan == ZANAHORIA:
-                                auxDist = Funciones.dist((i, j),
-                                                         (self.x, self.y))
-                                if auxDist < dist:
-                                    dist = auxDist
-                                    nearest_coord = (i, j)
-                            else:
-                                vision_scan, nearest_coord = ZANAHORIA, (i, j)
-                                dist = Funciones.dist((self.x, self.y), (i, j))
-
-                        elif vision_scan < ZANAHORIA and terrain[i][j][
-                                1] == ZANAHORIA_CONEJO and self.hunger * self.risk_aversion < ATTACK_LIMIT:
-                            if vision_scan == ZANAHORIA_CONEJO:
-                                auxDist = Funciones.dist((i, j),
-                                                         (self.x, self.y))
-                                if auxDist < dist:
-                                    dist = auxDist
-                                    nearest_coord = (i, j)
-                            else:
-                                vision_scan, nearest_coord = ZANAHORIA_CONEJO, (
-                                    i, j)
-                                dist = Funciones.dist((self.x, self.y), (i, j))
-
-                        elif vision_scan < ZANAHORIA_CONEJO and want_reproduction and terrain[
-                                i][j][1] == CONEJO:
-                            if vision_scan == CONEJO:
-                                auxDist = Funciones.dist((i, j),
-                                                         (self.x, self.y))
-                                if auxDist < dist:
-                                    dist = auxDist
-                                    nearest_coord = (i, j)
-                            else:
-                                vision_scan, nearest_coord = CONEJO, (i, j)
-                                dist = Funciones.dist((self.x, self.y), (i, j))
-
-            #veredicto final vision_scan
-            if vision_scan >= LINCE:
-                self.flee(nearest_coord[0], nearest_coord[1])
-            elif vision_scan == NADA:
-                self.moveRandom(terrain)
-                # print("NADA")
-            else:
-                if vision_scan == ZANAHORIA_CONEJO:
-                    self.wants_fight = True
-                elif vision_scan == CONEJO:
-                    self.wants_reproduction = True
-                self.goTo(nearest_coord[0], nearest_coord[1],
-                          terrain)  #vamos a comer o reproducirnos
-
-            #Sumamos el hambre
-            self.hunger += HUNGER_LOSS
+        #Sumamos el hambre
+        self.hunger += HUNGER_LOSS
 
     def moveRandom(self, terrain):
         random_eje_x = random.randint(-1, 1)
