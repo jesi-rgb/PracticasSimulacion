@@ -113,7 +113,7 @@ class Rabbit(Animal):
             self.eat(terrain)
         elif terrain[self.x][self.y][1] == CONEJO_REPRODUCCION and self.reproductive_need < REPRODUCTIONH_FEELING_LIMIT:
             if rabbit_reproduction_dict[str(self.x)+"-"+str(self.y)] == None:
-                terrain[self.x][self.y][1] == CONEJO_CONEJO
+                terrain[self.x][self.y][1] = CONEJO_CONEJO
                 self.reproductive_need = 1
             else:
                 self.reproduce(terrain, rabbit_dict)
