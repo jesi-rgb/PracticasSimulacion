@@ -6,6 +6,7 @@ import time, random, numpy as np
 
 from Funciones import HEIGTH, W_FACTOR, WIDTH, H_FACTOR
 
+
 # define a main function
 def main():
 
@@ -26,7 +27,7 @@ def main():
     rabbit_cont = 0
     rabo = Clases.Rabbit(40, 40)
     rabbit_dict[rabbit_cont] = rabo
-    rabbit_cont+=1
+    rabbit_cont += 1
     rabo2 = Clases.Rabbit(35, 35)
     rabbit_dict[rabbit_cont] = rabo2
 
@@ -74,6 +75,7 @@ def main():
 
         if down_pressed:
             time.sleep(.33)
+
 
 # run the main function only if this module is executed as the main script
 # (if you import this as a module then nothing is executed)

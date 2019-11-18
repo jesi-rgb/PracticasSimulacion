@@ -29,6 +29,17 @@ rabbit_fight_dict = dict()
 rabbit_reproduction_dict = dict()
 rabbit_cont = 0
 
+# contadores de causas de muerte para estadísticas
+rabbit_deaths_from_hunger = 0
+rabbit_deaths_from_rabbit_fight = 0
+rabbit_deaths_from_lynx_attack = 0
+rabbit_deaths_from_max_time = 0  # muerte por viejo soba
+
+lynx_deaths_from_hunger = 0
+lynx_deaths_from_lynx_fight = 0
+lynx_deaths_from_suffocation = 0
+lynx_deaths_from_max_alive = 0
+
 import Funciones
 from PIL import Image
 import numpy as np
@@ -49,7 +60,7 @@ class Animal:
         self.racionality = 0
 
         #Life attributes
-        self.max_time_alive = 100
+        self.max_time_alive = 10000
         self.time_alive = 0
 
         #Map position
@@ -81,8 +92,6 @@ class Rabbit(Animal):
 
     def display(self, terrain):
         '''Función para editar el valor x, y del mundo donde nos situamos ahora mismo'''
-        # oldValue = terrain[self.x][self.y]
-        # terrain[self.x][self.y] = [oldValue[0], CONEJO]
         if terrain[self.x][self.y][1] == ZANAHORIA_CONEJO:
             terrain[self.x][self.y][1] = PELEA_CONEJO
             rabbit_fight_dict[str(self.x) + "-" + str(
@@ -136,40 +145,69 @@ class Rabbit(Animal):
 
     def action(self, terrain, rabbit_dict):
         '''Función para calcular nuestra siguiente acción.'''
+        global rabbit_deaths_from_max_time
+        global rabbit_deaths_from_rabbit_fight
+        global rabbit_deaths_from_rabbit_fight
+        global rabbit_deaths_from_hunger
+
+        self.time_alive += 1
+        if (self.time_alive == self.max_time_alive):
+            rabbit_deaths_from_max_time += 1
+            print('death max time alive', rabbit_deaths_from_max_time)
+            self.die(terrain, rabbit_dict)
+
         if terrain[self.x][self.y][1] == ZANAHORIA_CONEJO:
             self.eat(terrain)
+
         elif terrain[self.x][self.y][
                 1] == CONEJO_REPRODUCCION and self.reproductive_need < REPRODUCTIONH_FEELING_LIMIT:
             if rabbit_reproduction_dict[str(self.x) + "-" +
                                         str(self.y)] == None:
                 terrain[self.x][self.y][1] == CONEJO_CONEJO
                 self.reproductive_need = 1
+
             else:
                 self.reproduce(terrain, rabbit_dict)
                 rabbit_reproduction_dict[str(self.x) + "-" +
                                          str(self.y)] = None
+
         elif terrain[self.x][self.y][1] == PELEA_CONEJO:
             if rabbit_fight_dict[str(self.x) + "-" +
                                  str(self.y)] == None:  #Ganaste tu
                 terrain[self.x][self.y][1] = ZANAHORIA_CONEJO
                 self.eat(terrain)
                 del rabbit_fight_dict[str(self.x) + "-" + str(self.y)]
+
             elif rabbit_fight_dict[str(self.x) + "-" +
                                    str(self.y)] == False:  #Gana el
                 self.die(terrain, rabbit_dict)
+
+                rabbit_deaths_from_rabbit_fight += 1
+                print('death rabbit fight', rabbit_deaths_from_rabbit_fight)
+
                 del rabbit_fight_dict[str(self.x) + "-" + str(self.y)]
+
             elif rabbit_fight_dict[str(self.x)+"-"+str(self.y)] \
                     > self.strength_speed * numero_random_que_borraremos: #El menor gana - Ganamos nosotros
                 rabbit_fight_dict[str(self.x) + "-" + str(self.y)] = False
                 self.eat(terrain)
+
             else:
                 rabbit_fight_dict[str(self.x) + "-" +
                                   str(self.y)] = None  #Gana el
                 self.die(terrain, rabbit_dict)
 
+                rabbit_deaths_from_rabbit_fight += 1
+                print('death rabbit fight', rabbit_deaths_from_rabbit_fight)
+
         elif terrain[self.x][self.y][1] == CONEJO_LINCE:
             pass
+
         elif self.hunger >= 1:
+            # muerte por hambre
+            rabbit_deaths_from_hunger += 1
+            print('death from hunger', rabbit_deaths_from_hunger)
+
             self.die(terrain, rabbit_dict)
         else:
             if vision_scan == ZANAHORIA_CONEJO:
@@ -179,6 +217,7 @@ class Rabbit(Animal):
             self.goTo(nearest_coord[0], nearest_coord[1],
                       terrain)  #vamos a comer o reproducirnos
 
+        else:
             #Check map with vision_field
             has_hunger = self.hunger > HUNGER_FEELING_LIMIT
             want_reproduction = self.reproductive_need < REPRODUCTIONH_FEELING_LIMIT
@@ -403,6 +442,7 @@ class Rabbit(Animal):
         pass
 
     def reproduce(self, terrain, rabbit_dict):
+        print('reproducing...')
         #mutar y juntar con rabbit_reproduction_dict
         aux_i = 0
         aux_j = 0
@@ -430,7 +470,6 @@ class Rabbit(Animal):
                 (self.y + aux_j) % (HEIGTH / H_FACTOR))][1] = CONEJO
 
     def die(self, terrain, rabbit_dict):
-        del rabbit_dict[self.id]
         aux = terrain[self.x][self.y][1]
 
         if aux == CONEJO:
@@ -443,6 +482,8 @@ class Rabbit(Animal):
             terrain[self.x][self.y][1] = LINCE
         elif aux == PELEA_CONEJO:
             terrain[self.x][self.y][1] = ZANAHORIA_CONEJO
+
+        del rabbit_dict[self.id]
 
 
 class Lynx(Animal):
