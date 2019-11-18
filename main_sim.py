@@ -24,11 +24,16 @@ def main():
 
     rabbit_dict = dict()
     rabbit_cont = 0
-    rabo = Clases.Rabbit(40, 40)
-    rabbit_dict[rabbit_cont] = rabo
-    rabbit_cont+=1
-    rabo2 = Clases.Rabbit(35, 35)
-    rabbit_dict[rabbit_cont] = rabo2
+
+    for _ in range(10):
+        rabbit_dict[rabbit_cont] = Clases.Rabbit(terrain.manipulable_world)
+        rabbit_cont+=1
+
+    # rabo = Clases.Rabbit(40, 40)
+    # rabbit_dict[rabbit_cont] = rabo
+    # rabbit_cont+=1
+    # rabo2 = Clases.Rabbit(35, 35)
+    # rabbit_dict[rabbit_cont] = rabo2
 
     running = True
     down_pressed = None
@@ -39,10 +44,11 @@ def main():
 
         # conejo se mueve en manipulable world
         rabbits = list(rabbit_dict.values())
+        if len(rabbits) == 0:
+            running = False
         for x in rabbits:
             x.action(terrain.manipulable_world, rabbit_dict)
-        #print(rabbit_dict.keys())
-        # rabo.goTo(200, 200, terrain.manipulable_world)
+
 
         # generamos terrain.world from manipulable world
         terrain.recalculate_world()
@@ -74,6 +80,7 @@ def main():
 
         if down_pressed:
             time.sleep(.33)
+
 
 # run the main function only if this module is executed as the main script
 # (if you import this as a module then nothing is executed)

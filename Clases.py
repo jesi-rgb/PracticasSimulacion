@@ -1,14 +1,17 @@
 HUNGER_LOSS = 0.005
 HUNGER_FEELING_LIMIT = 0.3
+REPRODUCTIVE_FEELING_GAIN = 0.0035
 REPRODUCTIONH_FEELING_LIMIT = 0.5
 ATTACK_LIMIT = 0.1
 MIN_SPEED = 5
 MAX_SPEED = 20
 EAT_DELAY = 2  #ticks
 HUNGER_QUENCH = 0.3
-MOVES_PER_ACTION = 1
+MOVES_PER_ACTION = 2
 EXTRA_STEP = 1
-numero_random_que_borraremos = 2
+MAX_TIME_ALIVE = 1000
+SEMILLA = 918273645
+VISION_LENGTH = 5
 
 #CASILLAS
 NADA = 0
@@ -36,48 +39,68 @@ import random
 from Funciones import HEIGTH, W_FACTOR, WIDTH, H_FACTOR
 
 
+random.seed(SEMILLA)
+
+
 class Animal:
-    def __init__(self, id, x, y):
+    def __init__(self, id, terrain, x = None, y = None, risk_av = None, strength_spe = None):
 
         #Survival attributes
         self.id = id
         self.hunger = 0
-        self.strength_speed = 0
         self.reproductive_need = 0
-        self.vision_field = 5
-        self.risk_aversion = 0
-        self.racionality = 0
+        self.vision_field = VISION_LENGTH
 
         #Life attributes
-        self.max_time_alive = 100
         self.time_alive = 0
 
         #Map position
-        self.x = x
-        self.y = y
+        if x is not None:
+            self.x = x
+            self.y = y
+            self.risk_aversion = risk_av
+            self.strength_speed = strength_spe
+
+
+        else:
+            animalCondition = (terrain[:, :, 1] == 0) & (terrain[:, :, 0] >= 2) & (
+                    terrain[:, :, 0] <= 3)
+
+            x, y = np.where(animalCondition)
+
+            i = random.randint(0, len(x)-1)
+
+            random_pos = [x[i], y[i]]
+
+            self.x = random_pos[0]
+            self.y = random_pos[1]
+
+            self.risk_aversion = random.random()
+            self.strength_speed = random.random()
+
 
         self.lastX = self.x
         self.lastY = self.y
 
+        #Desires
         self.wants_fight = False
         self.wants_reproduction = False
 
         self.eat_ticks = 0
 
-    def move(self, diffX, diffY):
-        if not (diffX == 0 or diffY == 0):
-            self.x += int(diffX / abs(diffX))
-            self.y += int(diffY / abs(diffY))
-        else:
-            self.x += 0
-            self.y += 0
-
 
 class Rabbit(Animal):
-    def __init__(self, x, y):
+    def __init__(self, terrain, x = None, y = None, risk_av = None, strength_spe = None):
         global rabbit_cont
-        Animal.__init__(self, rabbit_cont, x, y)
+
+        if x is not None:
+            Animal.__init__(self, rabbit_cont, terrain, x, y, risk_av, strength_spe)
+        else:
+            Animal.__init__(self, rabbit_cont, terrain)
+
         rabbit_cont += 1
+        terrain[self.x][self.y][1] = CONEJO
+
 
     def display(self, terrain):
         '''Función para editar el valor x, y del mundo donde nos situamos ahora mismo'''
@@ -88,11 +111,11 @@ class Rabbit(Animal):
 
             if terrain[self.x][self.y][1] == ZANAHORIA_CONEJO:
                 terrain[self.x][self.y][1] = PELEA_CONEJO
-                rabbit_fight_dict[str(self.x)+"-"+str(self.y)] = self.strength_speed * numero_random_que_borraremos
+                rabbit_fight_dict[str(self.x)+"-"+str(self.y)] = self.strength_speed * random.random()
             elif terrain[self.x][self.y][1] == ZANAHORIA:
                 terrain[self.x][self.y][1] = ZANAHORIA_CONEJO
             elif terrain[self.x][self.y][1] == CONEJO and self.wants_reproduction:
-                rabbit_reproduction_dict[str(self.x)+"-"+str(self.y)] = (self.strength_speed, self.risk_aversion)
+                rabbit_reproduction_dict[str(self.x)+"-"+str(self.y)] = (self.risk_aversion, self.strength_speed)
                 terrain[self.x][self.y][1] = CONEJO_REPRODUCCION
             elif terrain[self.x][self.y][1] == CONEJO and not self.wants_reproduction:
                 terrain[self.x][self.y][1] = CONEJO_CONEJO
@@ -114,13 +137,18 @@ class Rabbit(Animal):
 
     def action(self, terrain, rabbit_dict):
         '''Función para calcular nuestra siguiente acción.'''
+
+        self.time_alive += 1
+
         if terrain[self.x][self.y][1] == ZANAHORIA_CONEJO:
             self.eat(terrain)
-        elif terrain[self.x][self.y][1] == CONEJO_REPRODUCCION and self.reproductive_need < REPRODUCTIONH_FEELING_LIMIT:
+        elif terrain[self.x][self.y][1] == CONEJO_REPRODUCCION and self.reproductive_need > REPRODUCTIONH_FEELING_LIMIT:
             if rabbit_reproduction_dict[str(self.x)+"-"+str(self.y)] == None:
                 terrain[self.x][self.y][1] = CONEJO_CONEJO
-                self.reproductive_need = 1
+                self.reproductive_need = 0
+                del rabbit_reproduction_dict[str(self.x)+"-"+str(self.y)]
             else:
+                self.reproductive_need = 0
                 self.reproduce(terrain, rabbit_dict)
                 rabbit_reproduction_dict[str(self.x)+"-"+str(self.y)] = None
         elif terrain[self.x][self.y][1] == PELEA_CONEJO:
@@ -129,25 +157,27 @@ class Rabbit(Animal):
                 self.eat(terrain)
                 del rabbit_fight_dict[str(self.x)+"-"+str(self.y)]
             elif rabbit_fight_dict[str(self.x)+"-"+str(self.y)] == False: #Gana el
-                self.die(terrain, rabbit_dict)
+                self.die(terrain, rabbit_dict, "Rabbit Fight")
                 del rabbit_fight_dict[str(self.x)+"-"+str(self.y)]
             elif rabbit_fight_dict[str(self.x)+"-"+str(self.y)] \
-                    > self.strength_speed * numero_random_que_borraremos: #El menor gana - Ganamos nosotros
+                    > self.strength_speed * random.random(): #El menor gana - Ganamos nosotros
                 rabbit_fight_dict[str(self.x)+"-"+str(self.y)] = False
                 self.eat(terrain)
             else:
                 rabbit_fight_dict[str(self.x)+"-"+str(self.y)] = None #Gana el
-                self.die(terrain, rabbit_dict)
+                self.die(terrain, rabbit_dict, "Rabbit Fight")
 
-        elif terrain[self.x][self.y][1] == CONEJO_LINCE:
-            pass
+        elif terrain[self.x][self.y][1] == CONEJO_LINCE or terrain[self.x][self.y][1] == PELEA_LINCE:
+            self.die(terrain, rabbit_dict, "Eaten")
         elif self.hunger >= 1:
-            self.die(terrain, rabbit_dict)
+            self.die(terrain, rabbit_dict, "Hunger")
+        elif self.time_alive >= MAX_TIME_ALIVE:
+            self.die(terrain, rabbit_dict, "Old age")
         else:
 
             #Check map with vision_field
             has_hunger = self.hunger > HUNGER_FEELING_LIMIT
-            want_reproduction = self.reproductive_need < REPRODUCTIONH_FEELING_LIMIT
+            want_reproduction = self.reproductive_need > REPRODUCTIONH_FEELING_LIMIT
             vision_scan, nearest_coord = NADA, (None, None)
             dist = None
             for i in range(self.x - self.vision_field,
@@ -224,12 +254,23 @@ class Rabbit(Animal):
 
             #Sumamos el hambre
             self.hunger += HUNGER_LOSS
+            self.reproductive_need += REPRODUCTIVE_FEELING_GAIN
 
     def moveRandom(self, terrain):
-        random_eje_x = random.randint(-1, 1)
-        random_eje_y = random.randint(-1, 1)
+        if self.x <= 0:
+            random_eje_x = random.randint(0, 1)
+        elif self.x >= (HEIGTH/H_FACTOR)-1:
+            random_eje_x = random.randint(-1, 0)
+        else:
+            random_eje_x = random.randint(-1, 1)
+        if self.y <= 0:
+            random_eje_y = random.randint(0, 1)
+        elif self.y >= (HEIGTH/H_FACTOR)-1:
+            random_eje_y = random.randint(-1, 0)
+        else:
+            random_eje_y = random.randint(-1, 1)
 
-        extra = EXTRA_STEP if self.strength_speed > numero_random_que_borraremos else 0
+        extra = EXTRA_STEP if self.strength_speed > random.random() else 0
 
         for _ in range(MOVES_PER_ACTION + extra):
             diffX = random_eje_x
@@ -324,7 +365,7 @@ class Rabbit(Animal):
 
     def goTo(self, i, j, terrain):
         '''Función para ir a las coordenadas indicadas'''
-        extra = EXTRA_STEP if self.strength_speed > numero_random_que_borraremos else 0
+        extra = EXTRA_STEP if self.strength_speed > random.random() else 0
 
         for _ in range(MOVES_PER_ACTION + extra):
             diffX = i - self.x
@@ -365,16 +406,18 @@ class Rabbit(Animal):
                     exit
 
 
-        self.reproductive_need = 1
-
         global rabbit_cont
         if aux_i != 0 or aux_j != 0:
-            aux_rabbit = Rabbit(int((self.x+aux_i)%(WIDTH/W_FACTOR)) , int((self.y+aux_j)%(HEIGTH/H_FACTOR)))
+            risk2, strength2 = rabbit_reproduction_dict[str(self.x)+"-"+str(self.y)]
+            risk_av_child, strength_speed_child = Funciones.cruce_and_mutate(self.risk_aversion, risk2, self.strength_speed, strength2)
+
+            x_child = int((self.x+aux_i)%(WIDTH/W_FACTOR))
+            y_child = int((self.y+aux_j)%(HEIGTH/H_FACTOR))
+            aux_rabbit = Rabbit(terrain, x_child , y_child, risk_av_child, strength_speed_child)
             rabbit_dict[rabbit_cont-1] = aux_rabbit
             terrain[int((self.x+aux_i)%(WIDTH/W_FACTOR))][int((self.y+aux_j)%(HEIGTH/H_FACTOR))][1] = CONEJO
 
-
-    def die(self, terrain, rabbit_dict):
+    def die(self, terrain, rabbit_dict, mode):
         del rabbit_dict[self.id]
         aux = terrain[self.x][self.y][1]
 
@@ -388,7 +431,6 @@ class Rabbit(Animal):
             terrain[self.x][self.y][1] = LINCE
         elif aux == PELEA_CONEJO:
             terrain[self.x][self.y][1] = ZANAHORIA_CONEJO
-
 
 
 class Lynx(Animal):
@@ -411,7 +453,8 @@ class Zanahoria():
 
         x, y = np.where(carrotCondition)
 
-        i = np.random.randint(len(x))
+        i = random.randint(0, len(x)-1)
+
         random_pos = [x[i], y[i]]
 
         self.x = random_pos[0]
