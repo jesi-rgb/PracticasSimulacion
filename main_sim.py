@@ -3,10 +3,9 @@ import pygame
 from TerrainGenerator import Terrain
 import Clases
 import time, random, numpy as np
-# from graphs_manager import take_sample
 import matplotlib.animation as animation
 import matplotlib.pyplot as plt
-import global_variables
+import global_variables as gv
 
 from Funciones import HEIGTH, W_FACTOR, WIDTH, H_FACTOR
 
@@ -72,9 +71,7 @@ def main():
     screen = pygame.display.set_mode((WIDTH, HEIGTH))
 
     for _ in range(10):
-        print('aaa', global_variables.rabbit_id)
-        global_variables.rabbit_dict[global_variables.rabbit_id-1] = Clases.Rabbit(terrain.manipulable_world)
-        print(global_variables.rabbit_dict.keys())
+        gv.rabbit_dict[gv.rabbit_id-1] = Clases.Rabbit(terrain.manipulable_world)
 
     running = True
     down_pressed = None
@@ -88,11 +85,11 @@ def main():
             Clases.Zanahoria(terrain.manipulable_world)
 
         # conejo se mueve en manipulable world
-        rabbits = list(global_variables.rabbit_dict.values())
+        rabbits = list(gv.rabbit_dict.values())
         if len(rabbits) == 0:
             running = False
         for x in rabbits:
-            x.action(terrain.manipulable_world, global_variables.rabbit_dict)
+            x.action(terrain.manipulable_world, gv.rabbit_dict)
 
         # generamos terrain.world from manipulable world
         terrain.recalculate_world()
@@ -126,12 +123,13 @@ def main():
             time.sleep(.33)
         
         # para el live plotting de las estadísticas
-        ys[-1] = int(global_variables.rabbit_cont)
+        ys[-1] = int(gv.rabbit_cont)
         np.append(xs, int(pygame.time.get_ticks() // 1000))
         line1 = live_plotter(xs,ys,line1, 'Rabbit count')
         ys = np.append(ys[1:],0.0)
-        print(global_variables.rabbit_cont)
+        print(gv.rabbit_cont)
 
+    plt.plot(gv.rabbit_df.Time, gv.rabbit_df.Speed)
 
 # run the main function only if this module is executed as the main script
 # (if you import this as a module then nothing is executed)

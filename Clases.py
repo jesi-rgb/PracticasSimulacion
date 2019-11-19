@@ -9,17 +9,16 @@ EAT_DELAY = 2  #ticks
 HUNGER_QUENCH = 0.3
 MOVES_PER_ACTION = 2
 EXTRA_STEP = 1
-MAX_TIME_ALIVE = 1000
+MAX_TIME_ALIVE = 17
 SEMILLA = 918273645
 VISION_LENGTH = 5
 
 # Death mode
-OLD_AGE = 1000
-HUNGER = 1001
-RABBIT_FIGHT = 1002
-EATEN = 1003
-SUFFOCATION = 1004
-LYNX_FIGHT = 1005
+OLD_AGE = 'Old Age'
+HUNGER = 'Hunger'
+FIGHT = 'Fighting'
+EATEN = 'Eaten'
+SUFFOCATION = 'Suffocation'
 
 #CASILLAS
 NADA = 0
@@ -44,7 +43,9 @@ from PIL import Image
 import numpy as np
 import random
 from Funciones import HEIGTH, W_FACTOR, WIDTH, H_FACTOR
-import global_variables
+import global_variables as gv
+from pygame.time import get_ticks
+import pandas as pd
 
 
 
@@ -103,16 +104,14 @@ class Rabbit(Animal):
     def __init__(self, terrain, x = None, y = None, risk_av = None, strength_spe = None):
 
         if x is not None:
-            Animal.__init__(self, global_variables.rabbit_id, terrain, x, y, risk_av, strength_spe)
+            Animal.__init__(self, gv.rabbit_id, terrain, x, y, risk_av, strength_spe)
         else:
-            Animal.__init__(self, global_variables.rabbit_id, terrain)
+            Animal.__init__(self, gv.rabbit_id, terrain)
 
-        print(global_variables.rabbit_id, global_variables.rabbit_cont)
+        print(gv.rabbit_id, gv.rabbit_cont)
 
-        global_variables.rabbit_cont += 1
-        global_variables.rabbit_id += 1
-
-        
+        gv.rabbit_cont += 1
+        gv.rabbit_id += 1
 
         terrain[self.x][self.y][1] = CONEJO
 
@@ -159,7 +158,7 @@ class Rabbit(Animal):
 
         self.time_alive += 1
         if self.time_alive >= MAX_TIME_ALIVE:
-            self.die(terrain, global_variables.rabbit_dict, OLD_AGE)
+            self.die(terrain, gv.rabbit_dict, OLD_AGE)
 
         if terrain[self.x][self.y][1] == ZANAHORIA_CONEJO:
             self.eat(terrain)
@@ -172,7 +171,7 @@ class Rabbit(Animal):
 
             else:
                 self.reproductive_need = 0
-                self.reproduce(terrain, global_variables.rabbit_dict)
+                self.reproduce(terrain, gv.rabbit_dict)
                 rabbit_reproduction_dict[str(self.x)+"-"+str(self.y)] = None
 
         elif terrain[self.x][self.y][1] == PELEA_CONEJO:
@@ -182,7 +181,7 @@ class Rabbit(Animal):
                 del rabbit_fight_dict[str(self.x)+"-"+str(self.y)]
 
             elif rabbit_fight_dict[str(self.x)+"-"+str(self.y)] == False: #Gana el
-                self.die(terrain, global_variables.rabbit_dict, RABBIT_FIGHT)
+                self.die(terrain, gv.rabbit_dict, RABBIT_FIGHT)
                 del rabbit_fight_dict[str(self.x)+"-"+str(self.y)]
 
             elif rabbit_fight_dict[str(self.x)+"-"+str(self.y)] > self.strength_speed * random.random(): #El menor gana - Ganamos nosotros
@@ -191,13 +190,13 @@ class Rabbit(Animal):
 
             else:
                 rabbit_fight_dict[str(self.x)+"-"+str(self.y)] = None #Gana el
-                self.die(terrain, global_variables.rabbit_dict, RABBIT_FIGHT)
+                self.die(terrain, gv.rabbit_dict, RABBIT_FIGHT)
 
         elif terrain[self.x][self.y][1] == CONEJO_LINCE or terrain[self.x][self.y][1] == PELEA_LINCE:
-            self.die(terrain, global_variables.rabbit_dict, EATEN)
+            self.die(terrain, gv.rabbit_dict, EATEN)
 
         elif self.hunger >= 1:
-            self.die(terrain, global_variables.rabbit_dict, HUNGER)
+            self.die(terrain, gv.rabbit_dict, HUNGER)
 
         else:
             #Check map with vision_field
@@ -420,7 +419,6 @@ class Rabbit(Animal):
         pass
 
     def reproduce(self, terrain, rabbit_dict):
-        print('reproducing...')
         #mutar y juntar con rabbit_reproduction_dict
         aux_i = 0
         aux_j = 0
@@ -438,7 +436,7 @@ class Rabbit(Animal):
             x_child = int((self.x+aux_i)%(WIDTH/W_FACTOR))
             y_child = int((self.y+aux_j)%(HEIGTH/H_FACTOR))
             aux_rabbit = Rabbit(terrain, x_child , y_child, risk_av_child, strength_speed_child)
-            rabbit_dict[global_variables.rabbit_id-1] = aux_rabbit
+            rabbit_dict[gv.rabbit_id-1] = aux_rabbit
             terrain[int((self.x+aux_i)%(WIDTH/W_FACTOR))][int((self.y+aux_j)%(HEIGTH/H_FACTOR))][1] = CONEJO
 
     def die(self, terrain, rabbit_dict, mode):
@@ -457,28 +455,16 @@ class Rabbit(Animal):
             terrain[self.x][self.y][1] = ZANAHORIA_CONEJO
 
         if isinstance(self, Rabbit): #si somos un conejo
-            global_variables.rabbit_cont -= 1
-            print('Dead rabos', global_variables.rabbit_cont)
-            if mode == OLD_AGE:
-                global_variables.rabbit_deaths_from_max_time += 1
-            elif mode == HUNGER:
-                global_variables.rabbit_deaths_from_hunger += 1
-            elif mode == EATEN:
-                global_variables.rabbit_deaths_from_lynx_attack += 1
-            elif mode == RABBIT_FIGHT:
-                global_variables.rabbit_deaths_from_rabbit_fight += 1
-        
+            gv.rabbit_cont -= 1
+            gv.rabbit_df.loc[self.id-1] = [mode, self.strength_speed, self.risk_aversion, get_ticks() // 1000]
+            del gv.rabbit_dict[self.id]
+            
         else: # si no somos un conejo solo podemos ser un lince
-            if mode == OLD_AGE:
-                global_variables.lynx_deaths_from_max_time += 1
-            elif mode == HUNGER:
-                global_variables.lynx_deaths_from_hunger += 1
-            elif mode == SUFFOCATION:
-                global_variables.rabbit_deaths_from_lynx_attack += 1
-            elif mode == LYNX_FIGHT:
-                global_variables.rabbit_deaths_from_rabbit_fight += 1
+            gv.lynx_cont -= 1
+            gv.lynx_df.loc[self.id-1] = [mode, self.strength_speed, self.risk_aversion, get_ticks() // 1000]
+            del gv.lynx_dict[self.id]
 
-        del global_variables.rabbit_dict[self.id]
+        
 
 class Lynx(Animal):
     def __init__(self):
