@@ -25,9 +25,16 @@ def main():
     rabbit_dict = dict()
     rabbit_cont = 0
 
+    lynx_dict = dict()
+    lynx_cont = 0
+
     for _ in range(10):
         rabbit_dict[rabbit_cont] = Clases.Rabbit(terrain.manipulable_world)
         rabbit_cont+=1
+
+    for _ in range(10):
+        lynx_dict[lynx_cont] = Clases.Lynx(terrain.manipulable_world)
+        lynx_cont+=1
 
     # rabo = Clases.Rabbit(40, 40)
     # rabbit_dict[rabbit_cont] = rabo
@@ -48,6 +55,12 @@ def main():
             running = False
         for x in rabbits:
             x.action(terrain.manipulable_world, rabbit_dict)
+
+        lynxes = list(lynx_dict.values())
+        if len(lynxes) == 0:
+            running = False
+        for x in lynxes:
+            x.action(terrain.manipulable_world, lynx_dict)
 
 
         # generamos terrain.world from manipulable world

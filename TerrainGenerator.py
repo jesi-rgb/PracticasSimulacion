@@ -116,10 +116,12 @@ class Terrain:
         bunnyCondition = self.manipulable_world[:, :, 1] == CONEJO
         carrotCondition = self.manipulable_world[:, :, 1] == ZANAHORIA
         eatingCondition = self.manipulable_world[:, :, 1] == ZANAHORIA_CONEJO
+        lynxCondition = self.manipulable_world[:, :, 1] == LINCE
 
         self.world[bunnyCondition] = self.white
         self.world[carrotCondition] = self.orange
         self.world[eatingCondition] = [255, 80, 80]
+        self.world[lynxCondition] = [0,0,0]
 
     def reset_worlds(self):
         '''Función para resetear ambos mundos y prepararlos para el siguiente tick'''
