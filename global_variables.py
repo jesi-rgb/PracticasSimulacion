@@ -1,8 +1,8 @@
 import pandas as pd
 
 # modomuerte, speed, riskaversion, deathtime
-rabbit_df = pd.DataFrame(columns=['Death cause', 'Speed', 'Risk Aversion', 'Time'])
-lynx_df = pd.DataFrame(columns=['Death cause', 'Speed', 'Risk Aversion', 'Time'])
+rabbit_df = pd.DataFrame(columns=['Death cause', 'Speed', 'Risk Aversion', 'Age'])
+lynx_df = pd.DataFrame(columns=['Death cause', 'Speed', 'Risk Aversion', 'Age'])
 
 rabbit_dict = dict()
 

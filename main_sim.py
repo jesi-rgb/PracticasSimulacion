@@ -3,7 +3,6 @@ import pygame
 from TerrainGenerator import Terrain
 import Clases
 import time, random, numpy as np
-import matplotlib.animation as animation
 import matplotlib.pyplot as plt
 import global_variables as gv
 
@@ -39,21 +38,18 @@ def live_plotter(x_vec,y1_data,line1,identifier='',pause_time=0.01):
     # return line so we can update it again in the next iteration
     return line1
 
-def take_sample(i):
-    # x será el tiempo
-    # y el número de conejos en ese instante
+def simulation_analysis():
+    print('\n\nSimulation analysis:\n')
+    print(gv.rabbit_df.describe())
 
-    global xs, ys, fig, ax1
+    plt.close()
+    plt.ioff()
+    plt.figure(figsize=(5, 5))
+    plt.plot(gv.rabbit_df.Age, gv.rabbit_df.Speed, alpha=0.8)        
+    plt.ylabel('Speed value')
+    plt.title('Speed evolution')
+    plt.show()
 
-    new = rabbit_cont
-    
-    xs.append(pygame.time.get_ticks())
-    ys.append(new)
-
-    del new
-
-    ax1.clear()
-    ax1.plot(xs, ys)
 
 # define a main function
 def main():
@@ -70,6 +66,7 @@ def main():
 
     screen = pygame.display.set_mode((WIDTH, HEIGTH))
 
+    # inicializar el mundo con 10 conejos en lugares aleatorios
     for _ in range(10):
         gv.rabbit_dict[gv.rabbit_id-1] = Clases.Rabbit(terrain.manipulable_world)
 
@@ -127,12 +124,12 @@ def main():
         np.append(xs, int(pygame.time.get_ticks() // 1000))
         line1 = live_plotter(xs,ys,line1, 'Rabbit count')
         ys = np.append(ys[1:],0.0)
-        print(gv.rabbit_cont)
 
-    plt.plot(gv.rabbit_df.Time, gv.rabbit_df.Speed)
+    
 
 # run the main function only if this module is executed as the main script
 # (if you import this as a module then nothing is executed)
 if __name__ == "__main__":
     # call the main function
     main()
+    simulation_analysis()

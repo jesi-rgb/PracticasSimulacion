@@ -9,7 +9,7 @@ EAT_DELAY = 2  #ticks
 HUNGER_QUENCH = 0.3
 MOVES_PER_ACTION = 2
 EXTRA_STEP = 1
-MAX_TIME_ALIVE = 17
+MAX_TIME_ALIVE = 1000
 SEMILLA = 918273645
 VISION_LENGTH = 5
 
@@ -108,8 +108,6 @@ class Rabbit(Animal):
         else:
             Animal.__init__(self, gv.rabbit_id, terrain)
 
-        print(gv.rabbit_id, gv.rabbit_cont)
-
         gv.rabbit_cont += 1
         gv.rabbit_id += 1
 
@@ -181,7 +179,7 @@ class Rabbit(Animal):
                 del rabbit_fight_dict[str(self.x)+"-"+str(self.y)]
 
             elif rabbit_fight_dict[str(self.x)+"-"+str(self.y)] == False: #Gana el
-                self.die(terrain, gv.rabbit_dict, RABBIT_FIGHT)
+                self.die(terrain, gv.rabbit_dict, FIGHT)
                 del rabbit_fight_dict[str(self.x)+"-"+str(self.y)]
 
             elif rabbit_fight_dict[str(self.x)+"-"+str(self.y)] > self.strength_speed * random.random(): #El menor gana - Ganamos nosotros
@@ -190,7 +188,7 @@ class Rabbit(Animal):
 
             else:
                 rabbit_fight_dict[str(self.x)+"-"+str(self.y)] = None #Gana el
-                self.die(terrain, gv.rabbit_dict, RABBIT_FIGHT)
+                self.die(terrain, gv.rabbit_dict, FIGHT)
 
         elif terrain[self.x][self.y][1] == CONEJO_LINCE or terrain[self.x][self.y][1] == PELEA_LINCE:
             self.die(terrain, gv.rabbit_dict, EATEN)
@@ -397,7 +395,6 @@ class Rabbit(Animal):
 
             self.move(diffX, diffY, terrain)
 
-        # print(diffX, diffX, self.x, self.y)
         self.display(terrain)
 
     def flee(self, i, j):
@@ -456,12 +453,12 @@ class Rabbit(Animal):
 
         if isinstance(self, Rabbit): #si somos un conejo
             gv.rabbit_cont -= 1
-            gv.rabbit_df.loc[self.id-1] = [mode, self.strength_speed, self.risk_aversion, get_ticks() // 1000]
+            gv.rabbit_df.loc[self.id-1] = [mode, self.strength_speed, self.risk_aversion, float(get_ticks() // 1000)]
             del gv.rabbit_dict[self.id]
             
         else: # si no somos un conejo solo podemos ser un lince
             gv.lynx_cont -= 1
-            gv.lynx_df.loc[self.id-1] = [mode, self.strength_speed, self.risk_aversion, get_ticks() // 1000]
+            gv.lynx_df.loc[self.id-1] = [mode, self.strength_speed, self.risk_aversion, float(get_ticks() // 1000)]
             del gv.lynx_dict[self.id]
 
         
