@@ -43,7 +43,6 @@ rabbit_reproduction_dict = dict()
 
 lynx_fight_dict = dict()
 lynx_reproduction_dict = dict()
-lynx_cont = 0
 
 import Funciones
 from PIL import Image
@@ -61,10 +60,11 @@ random.seed(SEMILLA)
 
 class Rabbit:
     def __init__(self, terrain, x = None, y = None, risk_av = None, strength_spe = None):
-        global rabbit_cont
+
 
         #Survival attributes
-        self.id = rabbit_cont
+        self.id = gv.rabbit_id
+        gv.rabbit_id += 1
         self.hunger = 0
         self.reproductive_need = 0
         self.vision_field = VISION_LENGTH
@@ -107,14 +107,12 @@ class Rabbit:
 
         self.eat_ticks = 0
 
-        rabbit_cont += 1
+        gv.rabbit_cont += 1
         terrain[self.x][self.y][1] = CONEJO
 
 
     def display(self, terrain):
         '''Función para editar el valor x, y del mundo donde nos situamos ahora mismo'''
-        # oldValue = terrain[self.x][self.y]
-        # terrain[self.x][self.y] = [oldValue[0], CONEJO]
 
         if not (self.x == self.lastX and self.y == self.lastY):
             if terrain[self.x][self.y][1] == ZANAHORIA_CONEJO:
@@ -445,25 +443,20 @@ class Rabbit:
         elif aux == PELEA_CONEJO:
             terrain[self.x][self.y][1] = ZANAHORIA_CONEJO
 
-        if isinstance(self, Rabbit): #si somos un conejo
-            gv.rabbit_cont -= 1
-            gv.rabbit_df.loc[self.id-1] = [mode, self.strength_speed, self.risk_aversion, float(get_ticks() // 1000)]
-            del gv.rabbit_dict[self.id]
+        gv.rabbit_cont -= 1
+        gv.rabbit_df.loc[self.id-1] = [mode, self.strength_speed, self.risk_aversion, float(get_ticks() // 1000)]
+        del gv.rabbit_dict[self.id]
             
-        else: # si no somos un conejo solo podemos ser un lince
-            gv.lynx_cont -= 1
-            gv.lynx_df.loc[self.id-1] = [mode, self.strength_speed, self.risk_aversion, float(get_ticks() // 1000)]
-            del gv.lynx_dict[self.id]
+ 
 
         
 
 class Lynx:
     def __init__(self, terrain, x = None, y = None, risk_av = None, strength_spe = None):
 
-        global lynx_cont
-
         #Survival attributes
-        self.id = lynx_cont
+        self.id = gv.lynx_id
+        gv.lynx_id += 1
         self.suffocation = 0
         self.hunger = 0
         self.reproductive_need = 0
@@ -505,7 +498,7 @@ class Lynx:
 
         self.eat_ticks = 0
 
-        lynx_cont += 1
+        gv.lynx_cont += 1
         terrain[self.x][self.y][1] = LINCE
 
     def display(self, terrain):
@@ -550,8 +543,8 @@ class Lynx:
         '''Función para calcular nuestra siguiente acción.'''
 
         self.time_alive += 1
-
-        # print(terrain[self.x][self.y][1])
+        if self.time_alive >= MAX_TIME_ALIVE:
+            self.die(terrain, gv.lynx_dict, OLD_AGE)
 
         if terrain[self.x][self.y][1] == CONEJO_LINCE:
             self.eat(terrain)
@@ -562,7 +555,7 @@ class Lynx:
                 del lynx_reproduction_dict[str(self.x)+"-"+str(self.y)]
             else:
                 self.reproductive_need = 0
-                self.reproduce(terrain, lynx_dict)
+                self.reproduce(terrain, gv.lynx_dict)
                 lynx_reproduction_dict[str(self.x)+"-"+str(self.y)] = None
         elif terrain[self.x][self.y][1] == PELEA_LINCE:
             if lynx_fight_dict[str(self.x)+"-"+str(self.y)] == None: #Ganaste tu
@@ -570,7 +563,7 @@ class Lynx:
                 self.eat(terrain)
                 del lynx_fight_dict[str(self.x)+"-"+str(self.y)]
             elif lynx_fight_dict[str(self.x)+"-"+str(self.y)] == False: #Gana el
-                self.die(terrain, lynx_dict, "Lynx Fight")
+                self.die(terrain, gv.lynx_dict, FIGHT)
                 del lynx_fight_dict[str(self.x)+"-"+str(self.y)]
             elif lynx_fight_dict[str(self.x)+"-"+str(self.y)] \
                     > self.strength_speed * random.random(): #El menor gana - Ganamos nosotros
@@ -578,14 +571,13 @@ class Lynx:
                 self.eat(terrain)
             else:
                 lynx_fight_dict[str(self.x)+"-"+str(self.y)] = None #Gana el
-                self.die(terrain, lynx_dict, "Lynx Fight")
+                self.die(terrain, gv.lynx_dict, FIGHT)
 
         elif self.hunger >= 1:
-            self.die(terrain, lynx_dict, "Hunger")
-        elif self.time_alive >= MAX_TIME_ALIVE:
-            self.die(terrain, lynx_dict, "Old age")
+            self.die(terrain, gv.lynx_dict, HUNGER)
+
         elif self.suffocation > 1:
-            self.die(terrain, lynx_dict, "Suffocated")
+            self.die(terrain, gv.lynx_dict, SUFFOCATION)
         else:
 
             #Check map with vision_field
@@ -662,7 +654,7 @@ class Lynx:
                 self.suffocation += SUFFOCATION_GAIN
 
     def move(self, diffX, diffY, terrain):
-        lynx_possibilities = my_set = {NADA, CONEJO, ZANAHORIA_CONEJO, ZANAHORIA,
+        lynx_possibilities = {NADA, CONEJO, ZANAHORIA_CONEJO, ZANAHORIA,
                                        CONEJO_REPRODUCCION, CONEJO_CONEJO,PELEA_CONEJO,
                                        LINCE}
         absDiffX = 0 if diffX == 0 else diffX // abs(diffX)
@@ -770,7 +762,7 @@ class Lynx:
         self.display(terrain)
 
     def reproduce(self, terrain, lynx_dict):
-        #mutar y juntar con rabbit_reproduction_dict
+
         aux_i = 0
         aux_j = 0
         for i in range(-1,2):
@@ -780,8 +772,6 @@ class Lynx:
                     aux_j = j
                     exit
 
-
-        global rabbit_cont
         if aux_i != 0 or aux_j != 0:
             risk2, strength2 = lynx_reproduction_dict[str(self.x)+"-"+str(self.y)]
             risk_av_child, strength_speed_child = Funciones.cruce_and_mutate(self.risk_aversion, risk2, self.strength_speed, strength2)
@@ -789,11 +779,10 @@ class Lynx:
             x_child = int((self.x+aux_i)%(WIDTH/W_FACTOR))
             y_child = int((self.y+aux_j)%(HEIGTH/H_FACTOR))
             aux_lynx = Lynx(terrain, x_child , y_child, risk_av_child, strength_speed_child)
-            lynx_dict[lynx_cont-1] = aux_lynx
+            gv.lynx_dict[gv.lynx_id-1] = aux_lynx
             terrain[int((self.x+aux_i)%(WIDTH/W_FACTOR))][int((self.y+aux_j)%(HEIGTH/H_FACTOR))][1] = LINCE
 
     def die(self, terrain, lynx_dict, mode):
-        del lynx_dict[self.id]
         aux = terrain[self.x][self.y][1]
 
         if aux == LINCE:
@@ -804,6 +793,10 @@ class Lynx:
             terrain[self.x][self.y][1] = ZANAHORIA
         elif aux == LINCE_LINCE or aux == LINCE_REPRODUCCION or aux == PELEA_LINCE:
             terrain[self.x][self.y][1] = LINCE
+
+        gv.lynx_cont -= 1
+        gv.lynx_df.loc[self.id-1] = [mode, self.strength_speed, self.risk_aversion, float(get_ticks() // 1000)]
+        del gv.lynx_dict[self.id]
 
     def eat(self, terrain):
         self.eat_ticks += 1

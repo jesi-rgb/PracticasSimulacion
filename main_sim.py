@@ -10,10 +10,11 @@ from Funciones import HEIGTH, W_FACTOR, WIDTH, H_FACTOR
 
 plt.style.use('ggplot')
 xs = np.linspace(0,1,101)[0:-1]
-ys = np.zeros_like(xs)
+rabbit_data = np.zeros_like(xs)
+lynx_data = np.zeros_like(xs)
 
-def live_plotter(x_vec,y1_data,line1,identifier='',pause_time=0.01):
-    if line1==[]:
+def live_plotter(x_vec, y1_data, y2_data, line1, line2, identifier='', pause_time=0.01):
+    if line1==[] and line2 == []:
         # this is the call to matplotlib that allows dynamic plotting
         plt.ion()
         fig = plt.figure(figsize=(5, 5))
@@ -21,14 +22,22 @@ def live_plotter(x_vec,y1_data,line1,identifier='',pause_time=0.01):
         # create a variable for the line so we can later update it
         line1, = ax.plot(x_vec,y1_data,alpha=0.8)        
         #update plot label/title
-        plt.ylabel('Y Label')
+        plt.ylabel('Conejos')
         # plt.ylim(top=rabbit_cont + 20)
-        plt.title('Title: {}'.format(identifier))
+        plt.title(identifier)
+
+        ax2 = ax.twinx()  # instantiate a second axes that shares the same x-axis
+        color = [0, 0, 0]
+        ax2.set_ylabel('Linces', color=color)  # we already handled the x-label with ax1
+        line2, = ax2.plot(x_vec, y2_data, color=color, alpha=0.5)
+        ax2.tick_params(axis='y', labelcolor=color)
+
         plt.show()
         
     
     # after the figure, axis, and line are created, we only need to update the y-data
     line1.set_ydata(y1_data)
+    line2.set_ydata(y2_data)
     # adjust limits if new data goes beyond bounds
     if np.min(y1_data)<=line1.axes.get_ylim()[0] or np.max(y1_data)>=line1.axes.get_ylim()[1]:
         plt.ylim([np.min(y1_data)-np.std(y1_data),np.max(y1_data)+np.std(y1_data)])
@@ -36,7 +45,7 @@ def live_plotter(x_vec,y1_data,line1,identifier='',pause_time=0.01):
     plt.pause(pause_time)
     
     # return line so we can update it again in the next iteration
-    return line1
+    return line1, line2
 
 def simulation_analysis():
     print('\n\nSimulation analysis:\n')
@@ -53,7 +62,7 @@ def simulation_analysis():
 
 # define a main function
 def main():
-    global ys, xs
+    global rabbit_data, lynx_data, xs
 
     terrain = Terrain((WIDTH // W_FACTOR, HEIGTH // H_FACTOR), 100.0, 22.55,
                       89.55, 6, 0.45, 2)
@@ -66,44 +75,34 @@ def main():
 
     screen = pygame.display.set_mode((WIDTH, HEIGTH))
 
-    rabbit_dict = dict()
-    rabbit_cont = 0
-
-    lynx_dict = dict()
-    lynx_cont = 0
+    for _ in range(20):
+        gv.rabbit_dict[gv.rabbit_id-1] = Clases.Rabbit(terrain.manipulable_world)
 
     for _ in range(10):
-        rabbit_dict[rabbit_cont] = Clases.Rabbit(terrain.manipulable_world)
-        rabbit_cont+=1
-
-    for _ in range(10):
-        lynx_dict[lynx_cont] = Clases.Lynx(terrain.manipulable_world)
-        lynx_cont+=1
-
+        gv.lynx_dict[gv.lynx_id-1] = Clases.Lynx(terrain.manipulable_world)
 
     running = True
     down_pressed = None
     sample_time = 20
 
     line1 = []
+    line2 = []
     plt.ion()
 
     while running:
+
         if random.random() < 0.1:
             Clases.Zanahoria(terrain.manipulable_world)
 
-        # conejo se mueve en manipulable world
-        rabbits = list(rabbit_dict.values())
-        # if len(rabbits) == 0:
-        #     running = False
+        rabbits = list(gv.rabbit_dict.values())
+        if len(rabbits) == 0:
+            running = False
         for x in rabbits:
-            x.action(terrain.manipulable_world, rabbit_dict)
+            x.action(terrain.manipulable_world, gv.rabbit_dict)
 
-        lynxes = list(lynx_dict.values())
-        # if len(lynxes) == 0:
-        #     running = False
+        lynxes = list(gv.lynx_dict.values())
         for x in lynxes:
-            x.action(terrain.manipulable_world, lynx_dict)
+            x.action(terrain.manipulable_world, gv.lynx_dict)
 
 
         # generamos terrain.world from manipulable world
@@ -138,10 +137,12 @@ def main():
             time.sleep(.33)
         
         # para el live plotting de las estadísticas
-        ys[-1] = int(gv.rabbit_cont)
+        rabbit_data[-1] = int(gv.rabbit_cont)
+        lynx_data[-1] = int(gv.lynx_cont)
         np.append(xs, int(pygame.time.get_ticks() // 1000))
-        line1 = live_plotter(xs,ys,line1, 'Rabbit count')
-        ys = np.append(ys[1:],0.0)
+        line1, line2 = live_plotter(xs, rabbit_data, lynx_data, line1, line2, 'Contador Conejos vs Linces')
+        rabbit_data = np.append(rabbit_data[1:], 0.0)
+        lynx_data = np.append(lynx_data[1:], 0.0)
 
     
 
