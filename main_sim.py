@@ -3,64 +3,106 @@ import pygame
 from TerrainGenerator import Terrain
 import Clases
 import time, random, numpy as np
+import matplotlib.pyplot as plt
+import global_variables as gv
 
 from Funciones import HEIGTH, W_FACTOR, WIDTH, H_FACTOR
 
+plt.style.use('ggplot')
+xs = np.linspace(0,1,101)[0:-1]
+rabbit_data = np.zeros_like(xs)
+lynx_data = np.zeros_like(xs)
+
+def live_plotter(x_vec, y1_data, y2_data, line1, line2, identifier='', pause_time=0.01):
+    if line1==[] and line2 == []:
+        # this is the call to matplotlib that allows dynamic plotting
+        plt.ion()
+        fig = plt.figure(figsize=(5, 5))
+        ax = fig.add_subplot(111)
+        # create a variable for the line so we can later update it
+        line1, = ax.plot(x_vec,y1_data,alpha=0.8)        
+        #update plot label/title
+        plt.ylabel('Conejos')
+        # plt.ylim(top=rabbit_cont + 20)
+        plt.title(identifier)
+
+        ax2 = ax.twinx()  # instantiate a second axes that shares the same x-axis
+        color = [0, 0, 0]
+        ax2.set_ylabel('Linces', color=color)  # we already handled the x-label with ax1
+        line2, = ax2.plot(x_vec, y2_data, color=color, alpha=0.5)
+        ax2.tick_params(axis='y', labelcolor=color)
+
+        plt.show()
+        
+    
+    # after the figure, axis, and line are created, we only need to update the y-data
+    line1.set_ydata(y1_data)
+    line2.set_ydata(y2_data)
+    # adjust limits if new data goes beyond bounds
+    if np.min(y1_data)<=line1.axes.get_ylim()[0] or np.max(y1_data)>=line1.axes.get_ylim()[1]:
+        plt.ylim([np.min(y1_data)-np.std(y1_data),np.max(y1_data)+np.std(y1_data)])
+    # this pauses the data so the figure/axis can catch up - the amount of pause can be altered above
+    plt.pause(pause_time)
+    
+    # return line so we can update it again in the next iteration
+    return line1, line2
+
+def simulation_analysis():
+    print('\n\nSimulation analysis:\n')
+    print(gv.rabbit_df.describe())
+
+    plt.close()
+    plt.ioff()
+    plt.figure(figsize=(5, 5))
+    plt.plot(gv.rabbit_df.Age, gv.rabbit_df.Speed, alpha=0.8)        
+    plt.ylabel('Speed value')
+    plt.title('Speed evolution')
+    plt.show()
+
+
 # define a main function
 def main():
+    global rabbit_data, lynx_data, xs
 
     terrain = Terrain((WIDTH // W_FACTOR, HEIGTH // H_FACTOR), 100.0, 22.55,
                       89.55, 6, 0.45, 2)
     terrain.add_color()
     print("World size: ", WIDTH // W_FACTOR, HEIGTH // H_FACTOR)
 
-    clock = pygame.time.Clock()
-
     # initialize the pygame module
     pygame.init()
-    pygame.display.set_caption("Proyecto Simulacion")
+    pygame.display.set_caption("Proyecto Simulacion: Modelo Evolutivo")
 
     screen = pygame.display.set_mode((WIDTH, HEIGTH))
 
-    rabbit_dict = dict()
-    rabbit_cont = 0
-
-    lynx_dict = dict()
-    lynx_cont = 0
+    for _ in range(20):
+        gv.rabbit_dict[gv.rabbit_id-1] = Clases.Rabbit(terrain.manipulable_world)
 
     for _ in range(10):
-        rabbit_dict[rabbit_cont] = Clases.Rabbit(terrain.manipulable_world)
-        rabbit_cont+=1
-
-    for _ in range(10):
-        lynx_dict[lynx_cont] = Clases.Lynx(terrain.manipulable_world)
-        lynx_cont+=1
-
-    # rabo = Clases.Rabbit(40, 40)
-    # rabbit_dict[rabbit_cont] = rabo
-    # rabbit_cont+=1
-    # rabo2 = Clases.Rabbit(35, 35)
-    # rabbit_dict[rabbit_cont] = rabo2
+        gv.lynx_dict[gv.lynx_id-1] = Clases.Lynx(terrain.manipulable_world)
 
     running = True
     down_pressed = None
+    sample_time = 20
+
+    line1 = []
+    line2 = []
+    plt.ion()
 
     while running:
+
         if random.random() < 0.1:
             Clases.Zanahoria(terrain.manipulable_world)
 
-        # conejo se mueve en manipulable world
-        rabbits = list(rabbit_dict.values())
-        # if len(rabbits) == 0:
-        #     running = False
+        rabbits = list(gv.rabbit_dict.values())
+        if len(rabbits) == 0:
+            running = False
         for x in rabbits:
-            x.action(terrain.manipulable_world, rabbit_dict)
+            x.action(terrain.manipulable_world, gv.rabbit_dict)
 
-        lynxes = list(lynx_dict.values())
-        # if len(lynxes) == 0:
-        #     running = False
+        lynxes = list(gv.lynx_dict.values())
         for x in lynxes:
-            x.action(terrain.manipulable_world, lynx_dict)
+            x.action(terrain.manipulable_world, gv.lynx_dict)
 
 
         # generamos terrain.world from manipulable world
@@ -93,10 +135,20 @@ def main():
 
         if down_pressed:
             time.sleep(.33)
+        
+        # para el live plotting de las estadísticas
+        rabbit_data[-1] = int(gv.rabbit_cont)
+        lynx_data[-1] = int(gv.lynx_cont)
+        np.append(xs, int(pygame.time.get_ticks() // 1000))
+        line1, line2 = live_plotter(xs, rabbit_data, lynx_data, line1, line2, 'Contador Conejos vs Linces')
+        rabbit_data = np.append(rabbit_data[1:], 0.0)
+        lynx_data = np.append(lynx_data[1:], 0.0)
 
+    
 
 # run the main function only if this module is executed as the main script
 # (if you import this as a module then nothing is executed)
 if __name__ == "__main__":
     # call the main function
     main()
+    simulation_analysis()

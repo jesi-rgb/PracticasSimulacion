@@ -1,10 +1,9 @@
 import math
 import random
 
-
 WIDTH, HEIGTH = 800, 800
-W_FACTOR = 10
-H_FACTOR = 10
+W_FACTOR = 4
+H_FACTOR = 4
 
 def dist(position, target):
     '''Devuelve la distancia euclidea de las dos coordenadas'''
