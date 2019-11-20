@@ -13,6 +13,7 @@ xs = np.linspace(0,1,101)[0:-1]
 rabbit_data = np.zeros_like(xs)
 lynx_data = np.zeros_like(xs)
 
+
 def live_plotter(x_vec, y1_data, y2_data, line1, line2, identifier='', pause_time=0.01):
     if line1==[] and line2 == []:
         # this is the call to matplotlib that allows dynamic plotting
@@ -54,9 +55,11 @@ def simulation_analysis():
     plt.close()
     plt.ioff()
     plt.figure(figsize=(5, 5))
-    plt.plot(gv.rabbit_df.Age, gv.rabbit_df.Speed, alpha=0.8)        
-    plt.ylabel('Speed value')
-    plt.title('Speed evolution')
+    x = np.arange(len(rabbit_data[:-1]))
+    plt.plot(x, rabbit_data[:-1], x, lynx_data[:-1])   
+    plt.legend(['Rabbits', 'Lynxes'])  
+    plt.ylabel('Number of entities')
+    plt.title('Population evolution')
     plt.show()
 
 
@@ -75,10 +78,10 @@ def main():
 
     screen = pygame.display.set_mode((WIDTH, HEIGTH))
 
-    for _ in range(20):
+    for _ in range(200):
         gv.rabbit_dict[gv.rabbit_id-1] = Clases.Rabbit(terrain.manipulable_world)
 
-    for _ in range(10):
+    for _ in range(100):
         gv.lynx_dict[gv.lynx_id-1] = Clases.Lynx(terrain.manipulable_world)
 
     running = True
@@ -91,7 +94,7 @@ def main():
 
     while running:
 
-        if random.random() < 0.1:
+        if random.random() < 5:
             Clases.Zanahoria(terrain.manipulable_world)
 
         rabbits = list(gv.rabbit_dict.values())
