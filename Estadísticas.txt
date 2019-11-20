@@ -1,0 +1,1 @@
+Tener un panda.dataframe y cada vez que muera un conejo poner sus características y la forma en la que ha muerto para hacer estadísticas al final.

@@ -66,9 +66,20 @@ def main():
 
     screen = pygame.display.set_mode((WIDTH, HEIGTH))
 
-    # inicializar el mundo con 10 conejos en lugares aleatorios
+    rabbit_dict = dict()
+    rabbit_cont = 0
+
+    lynx_dict = dict()
+    lynx_cont = 0
+
     for _ in range(10):
-        gv.rabbit_dict[gv.rabbit_id-1] = Clases.Rabbit(terrain.manipulable_world)
+        rabbit_dict[rabbit_cont] = Clases.Rabbit(terrain.manipulable_world)
+        rabbit_cont+=1
+
+    for _ in range(10):
+        lynx_dict[lynx_cont] = Clases.Lynx(terrain.manipulable_world)
+        lynx_cont+=1
+
 
     running = True
     down_pressed = None
@@ -82,11 +93,18 @@ def main():
             Clases.Zanahoria(terrain.manipulable_world)
 
         # conejo se mueve en manipulable world
-        rabbits = list(gv.rabbit_dict.values())
-        if len(rabbits) == 0:
-            running = False
+        rabbits = list(rabbit_dict.values())
+        # if len(rabbits) == 0:
+        #     running = False
         for x in rabbits:
-            x.action(terrain.manipulable_world, gv.rabbit_dict)
+            x.action(terrain.manipulable_world, rabbit_dict)
+
+        lynxes = list(lynx_dict.values())
+        # if len(lynxes) == 0:
+        #     running = False
+        for x in lynxes:
+            x.action(terrain.manipulable_world, lynx_dict)
+
 
         # generamos terrain.world from manipulable world
         terrain.recalculate_world()
