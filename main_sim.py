@@ -51,14 +51,14 @@ def main():
 
         # conejo se mueve en manipulable world
         rabbits = list(rabbit_dict.values())
-        if len(rabbits) == 0:
-            running = False
+        # if len(rabbits) == 0:
+        #     running = False
         for x in rabbits:
             x.action(terrain.manipulable_world, rabbit_dict)
 
         lynxes = list(lynx_dict.values())
-        if len(lynxes) == 0:
-            running = False
+        # if len(lynxes) == 0:
+        #     running = False
         for x in lynxes:
             x.action(terrain.manipulable_world, lynx_dict)
 
