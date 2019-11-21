@@ -12,6 +12,9 @@ plt.style.use('ggplot')
 xs = np.linspace(0,1,101)[0:-1]
 rabbit_data = np.zeros_like(xs)
 lynx_data = np.zeros_like(xs)
+final_graph_r = np.array([0])
+final_graph_l = np.array([0])
+final_graph_x = np.array([0])
 
 
 def live_plotter(x_vec, y1_data, y2_data, line1, line2, identifier='', pause_time=0.01):
@@ -56,7 +59,7 @@ def simulation_analysis():
     plt.ioff()
     plt.figure(figsize=(5, 5))
     x = np.arange(len(rabbit_data[:-1]))
-    plt.plot(x, rabbit_data[:-1], x, lynx_data[:-1])   
+    plt.plot(final_graph_x[:-1], final_graph_r[:-1], final_graph_x[:-1], final_graph_l[:-1])    
     plt.legend(['Rabbits', 'Lynxes'])  
     plt.ylabel('Number of entities')
     plt.title('Population evolution')
@@ -65,7 +68,7 @@ def simulation_analysis():
 
 # define a main function
 def main():
-    global rabbit_data, lynx_data, xs
+    global rabbit_data, lynx_data, xs, final_graph_l, final_graph_r, final_graph_x
 
     terrain = Terrain((WIDTH // W_FACTOR, HEIGTH // H_FACTOR), 100.0, 22.55,
                       89.55, 6, 0.45, 2)
@@ -142,10 +145,16 @@ def main():
         # para el live plotting de las estadísticas
         rabbit_data[-1] = int(gv.rabbit_cont)
         lynx_data[-1] = int(gv.lynx_cont)
-        np.append(xs, int(pygame.time.get_ticks() // 1000))
+
+        final_graph_l = np.append(final_graph_l, int(gv.lynx_cont))
+        final_graph_r = np.append(final_graph_r, int(gv.rabbit_cont))
+        final_graph_x = np.append(final_graph_x, int(pygame.time.get_ticks() // 1000))
+
+        # np.append(xs, int(pygame.time.get_ticks() // 1000))
         line1, line2 = live_plotter(xs, rabbit_data, lynx_data, line1, line2, 'Contador Conejos vs Linces')
         rabbit_data = np.append(rabbit_data[1:], 0.0)
         lynx_data = np.append(lynx_data[1:], 0.0)
+        
 
     
 
