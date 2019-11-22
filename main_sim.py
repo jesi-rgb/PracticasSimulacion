@@ -8,7 +8,7 @@ import global_variables as gv
 
 from Funciones import HEIGTH, W_FACTOR, WIDTH, H_FACTOR
 
-# plt.style.use('fivethirtyeight')
+
 xs = np.linspace(0,1,101)[0:-1]
 rabbit_data = np.zeros_like(xs)
 lynx_data = np.zeros_like(xs)
@@ -21,10 +21,10 @@ def live_plotter(x_vec, y1_data, y2_data, line1, line2, identifier='', pause_tim
     if line1==[] and line2 == []:
         # this is the call to matplotlib that allows dynamic plotting
         plt.ion()
-        fig = plt.figure(figsize=(5, 5))
+        fig = plt.figure(figsize=(6, 5))
         ax = fig.add_subplot(111)
         # create a variable for the line so we can later update it
-        line1, = ax.plot(x_vec,y1_data, alpha=0.8)        
+        line1, = ax.plot(x_vec,y1_data, alpha=0.8, linewidth=2)        
         #update plot label/title
         plt.ylabel('Conejos')
         # plt.ylim(top=rabbit_cont + 20)
@@ -32,7 +32,7 @@ def live_plotter(x_vec, y1_data, y2_data, line1, line2, identifier='', pause_tim
 
         ax2 = ax.twinx()  # instantiate a second axes that shares the same x-axis
         ax2.set_ylabel('Linces')  # we already handled the x-label with ax1
-        line2, = ax2.plot(x_vec, y2_data, color='tab:orange', alpha=0.8)
+        line2, = ax2.plot(x_vec, y2_data, color='tab:orange', alpha=0.8, linewidth=2)
         # ax2.tick_params(axis='y')
 
         plt.show()
@@ -58,9 +58,10 @@ def simulation_analysis():
     plt.ioff()
     plt.figure(figsize=(5, 5))
     x = np.arange(len(rabbit_data[:-1]))
-    plt.plot(final_graph_x[:-1], final_graph_r[:-1], final_graph_x[:-1], final_graph_l[:-1])    
+    plt.plot(final_graph_x[:-1], final_graph_r[:-1], final_graph_x[:-1], final_graph_l[:-1], linewidth=2)    
     plt.legend(['Rabbits', 'Lynxes'])  
     plt.ylabel('Number of entities')
+    plt.xlabel('Game ticks')
     plt.title('Population evolution')
     plt.show()
 
