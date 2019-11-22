@@ -8,7 +8,7 @@ import global_variables as gv
 
 from Funciones import HEIGTH, W_FACTOR, WIDTH, H_FACTOR
 
-plt.style.use('ggplot')
+# plt.style.use('fivethirtyeight')
 xs = np.linspace(0,1,101)[0:-1]
 rabbit_data = np.zeros_like(xs)
 lynx_data = np.zeros_like(xs)
@@ -24,17 +24,16 @@ def live_plotter(x_vec, y1_data, y2_data, line1, line2, identifier='', pause_tim
         fig = plt.figure(figsize=(5, 5))
         ax = fig.add_subplot(111)
         # create a variable for the line so we can later update it
-        line1, = ax.plot(x_vec,y1_data,alpha=0.8)        
+        line1, = ax.plot(x_vec,y1_data, alpha=0.8)        
         #update plot label/title
         plt.ylabel('Conejos')
         # plt.ylim(top=rabbit_cont + 20)
         plt.title(identifier)
 
         ax2 = ax.twinx()  # instantiate a second axes that shares the same x-axis
-        color = [0, 0, 0]
-        ax2.set_ylabel('Linces', color=color)  # we already handled the x-label with ax1
-        line2, = ax2.plot(x_vec, y2_data, color=color, alpha=0.5)
-        ax2.tick_params(axis='y', labelcolor=color)
+        ax2.set_ylabel('Linces')  # we already handled the x-label with ax1
+        line2, = ax2.plot(x_vec, y2_data, color='tab:orange', alpha=0.8)
+        # ax2.tick_params(axis='y')
 
         plt.show()
         
