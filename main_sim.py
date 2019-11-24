@@ -81,11 +81,14 @@ def main():
 
     screen = pygame.display.set_mode((WIDTH, HEIGTH))
 
-    for _ in range(200):
+    for _ in range(150):
         gv.rabbit_dict[gv.rabbit_id-1] = Clases.Rabbit(terrain.manipulable_world)
 
-    for _ in range(100):
+    for _ in range(40):
         gv.lynx_dict[gv.lynx_id-1] = Clases.Lynx(terrain.manipulable_world)
+
+    for _ in range(50):
+        Clases.Zanahoria(terrain.manipulable_world)
 
     running = True
     down_pressed = None
@@ -98,6 +101,7 @@ def main():
     while running:
 
         if random.random() < 5:
+            Clases.Zanahoria(terrain.manipulable_world)
             Clases.Zanahoria(terrain.manipulable_world)
 
         rabbits = list(gv.rabbit_dict.values())

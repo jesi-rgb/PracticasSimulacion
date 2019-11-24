@@ -1,7 +1,22 @@
-HUNGER_LOSS = 0.005
-HUNGER_FEELING_LIMIT = 0.3
-REPRODUCTIVE_FEELING_GAIN = 0.0035
-REPRODUCTIONH_FEELING_LIMIT = 0.5
+LYNX_HUNGER_LOSS = 0.003
+LYNX_REPRODUCTIVE_FEELING_GAIN = 0.0025
+LYNX_HUNGER_FEELING_LIMIT = 0.5
+
+LYNX_MAX_INITIAL_HUNGER = 0.5
+LYNX_MAX_INITIAL_REPR = 0.2
+
+RABBIT_HUNGER_LOSS = 0.01
+RABBIT_REPRODUCTIVE_FEELING_GAIN = 0.015
+RABBIT_HUNGER_FEELING_LIMIT = 0.3
+
+RABBIT_MAX_INITIAL_HUNGER = 0.5
+RABBIT_MAX_INITIAL_REPR = 0.4
+
+REPRODUCTIONH_FEELING_LIMIT = 1
+
+SUFFOCATION_GAIN = 0.028
+SUFFOCATION_LOSS = 0.08
+
 ATTACK_LIMIT = 0.1
 MIN_SPEED = 5
 MAX_SPEED = 20
@@ -12,8 +27,7 @@ EXTRA_STEP = 1
 MAX_TIME_ALIVE = 1000
 SEMILLA = 918273645
 VISION_LENGTH = 5
-SUFFOCATION_GAIN = 0.05
-SUFFOCATION_LOSS = 0.1
+
 
 # Death mode
 OLD_AGE = 'Old Age'
@@ -65,12 +79,12 @@ class Rabbit:
         #Survival attributes
         self.id = gv.rabbit_id
         gv.rabbit_id += 1
-        self.hunger = 0
-        self.reproductive_need = 0
+        self.hunger = random.uniform(0, RABBIT_MAX_INITIAL_HUNGER)
+        self.reproductive_need = random.uniform(0, RABBIT_MAX_INITIAL_REPR)
         self.vision_field = VISION_LENGTH
 
         #Life attributes
-        self.max_time_alive = 10000
+        self.max_time_alive = MAX_TIME_ALIVE * random.uniform(0.6, 1)
         self.time_alive = 0
 
         #Map position
@@ -118,17 +132,17 @@ class Rabbit:
             if terrain[self.x][self.y][1] == ZANAHORIA_CONEJO:
                 terrain[self.x][self.y][1] = PELEA_CONEJO
                 rabbit_fight_dict[str(self.x)+"-"+str(self.y)] = self.strength_speed * random.random()
-            
+
             elif terrain[self.x][self.y][1] == ZANAHORIA:
                 terrain[self.x][self.y][1] = ZANAHORIA_CONEJO
-            
+
             elif terrain[self.x][self.y][1] == CONEJO and self.wants_reproduction:
                 rabbit_reproduction_dict[str(self.x)+"-"+str(self.y)] = (self.risk_aversion, self.strength_speed)
                 terrain[self.x][self.y][1] = CONEJO_REPRODUCCION
-            
+
             elif terrain[self.x][self.y][1] == CONEJO and not self.wants_reproduction:
                 terrain[self.x][self.y][1] = CONEJO_CONEJO
-            
+
             else:
                 terrain[self.x][self.y][1] = CONEJO
 
@@ -136,13 +150,13 @@ class Rabbit:
 
             if terrain[self.lastX][self.lastY][1] == CONEJO:
                 terrain[self.lastX][self.lastY][1] = NADA
-            
+
             elif terrain[self.lastX][self.lastY][1] == NADA:
                 terrain[self.lastX][self.lastY][1] = NADA
-            
+
             else:
                 terrain[self.lastX][self.lastY][1] = CONEJO
-            
+
             self.lastX = self.x
             self.lastY = self.y
 
@@ -150,7 +164,7 @@ class Rabbit:
         '''Función para calcular nuestra siguiente acción.'''
 
         self.time_alive += 1
-        if self.time_alive >= MAX_TIME_ALIVE:
+        if self.time_alive >= self.max_time_alive:
             self.die(terrain, gv.rabbit_dict, OLD_AGE)
 
         if terrain[self.x][self.y][1] == ZANAHORIA_CONEJO:
@@ -193,7 +207,7 @@ class Rabbit:
 
         else:
             #Check map with vision_field
-            has_hunger = self.hunger > HUNGER_FEELING_LIMIT
+            has_hunger = self.hunger > RABBIT_HUNGER_FEELING_LIMIT
             want_reproduction = self.reproductive_need > REPRODUCTIONH_FEELING_LIMIT
             vision_scan, nearest_coord = NADA, (None, None)
             dist = None
@@ -272,8 +286,8 @@ class Rabbit:
                           terrain)  #vamos a comer o reproducirnos
 
             #Sumamos el hambre
-            self.hunger += HUNGER_LOSS
-            self.reproductive_need += REPRODUCTIVE_FEELING_GAIN
+            self.hunger += RABBIT_HUNGER_LOSS
+            self.reproductive_need += RABBIT_REPRODUCTIVE_FEELING_GAIN
 
     def moveRandom(self, terrain):
         if self.x <= 0:
@@ -431,7 +445,6 @@ class Rabbit:
             terrain[int((self.x+aux_i)%(WIDTH/W_FACTOR))][int((self.y+aux_j)%(HEIGTH/H_FACTOR))][1] = CONEJO
 
     def die(self, terrain, rabbit_dict, mode):
-
         aux = terrain[self.x][self.y][1]
 
         if aux == CONEJO:
@@ -439,17 +452,17 @@ class Rabbit:
         elif aux == ZANAHORIA_CONEJO:
             terrain[self.x][self.y][1] = ZANAHORIA
         elif aux == CONEJO_CONEJO or aux == CONEJO_REPRODUCCION:
-            terrain[self.x][self.y][1] = CONEJO
+            terrain[self.x][self.y][1] = NADA
         elif aux == PELEA_CONEJO:
             terrain[self.x][self.y][1] = ZANAHORIA_CONEJO
 
         gv.rabbit_cont -= 1
         gv.rabbit_df.loc[self.id-1] = [mode, self.strength_speed, self.risk_aversion, float(get_ticks() // 1000)]
         del gv.rabbit_dict[self.id]
-            
- 
 
-        
+
+
+
 
 class Lynx:
     def __init__(self, terrain, x = None, y = None, risk_av = None, strength_spe = None):
@@ -458,11 +471,12 @@ class Lynx:
         self.id = gv.lynx_id
         gv.lynx_id += 1
         self.suffocation = 0
-        self.hunger = 0
-        self.reproductive_need = 0
+        self.hunger = random.uniform(0, LYNX_MAX_INITIAL_HUNGER)
+        self.reproductive_need = random.uniform(0, LYNX_MAX_INITIAL_REPR)
         self.vision_field = VISION_LENGTH
 
         #Life attributes
+        self.max_time_alive = MAX_TIME_ALIVE * random.uniform(0.6, 1)
         self.time_alive = 0
 
         #Map position
@@ -491,6 +505,12 @@ class Lynx:
 
         self.lastX = self.x
         self.lastY = self.y
+
+        self.lastMountainX = self.x
+        self.lastMountainY = self.y
+
+        self.lastGreenX = None
+        self.lastGreenY = None
 
         #Desires
         self.wants_fight = False
@@ -543,7 +563,7 @@ class Lynx:
         '''Función para calcular nuestra siguiente acción.'''
 
         self.time_alive += 1
-        if self.time_alive >= MAX_TIME_ALIVE:
+        if self.time_alive >= self.max_time_alive:
             self.die(terrain, gv.lynx_dict, OLD_AGE)
 
         if terrain[self.x][self.y][1] == CONEJO_LINCE:
@@ -578,13 +598,37 @@ class Lynx:
 
         elif self.suffocation > 1:
             self.die(terrain, gv.lynx_dict, SUFFOCATION)
+        elif (0.9 - self.suffocation ) < \
+                (Funciones.dist((self.x, self.y),(self.lastMountainX, self.lastMountainY)) * SUFFOCATION_GAIN):
+            # print("Voy a respirar")
+            self.hunger += LYNX_HUNGER_LOSS
+            self.reproductive_need += LYNX_REPRODUCTIVE_FEELING_GAIN
+            if terrain[self.x][self.y][0] >= 5:
+                self.suffocation -= SUFFOCATION_LOSS
+            else:
+                self.suffocation += SUFFOCATION_GAIN
+            self.goTo(self.lastMountainX, self.lastMountainY, terrain)
+        elif self.hunger > LYNX_HUNGER_FEELING_LIMIT and terrain[self.x][self.y][0] >=5 \
+                and self.lastGreenX is not None and self.suffocation < 0.8:
+            # print("Voy a comer", terrain[self.lastGreenX][self.lastGreenY][0])
+            self.hunger += LYNX_HUNGER_LOSS
+            self.reproductive_need += LYNX_REPRODUCTIVE_FEELING_GAIN
+            if terrain[self.x][self.y][0] >= 5:
+                self.suffocation -= SUFFOCATION_LOSS
+            else:
+                self.suffocation += SUFFOCATION_GAIN
+            self.goTo(self.lastGreenX, self.lastGreenY, terrain)
         else:
 
             #Check map with vision_field
-            has_hunger = self.hunger > HUNGER_FEELING_LIMIT
+            has_hunger = self.hunger > LYNX_HUNGER_FEELING_LIMIT
             want_reproduction = self.reproductive_need > REPRODUCTIONH_FEELING_LIMIT
             vision_scan, nearest_coord = NADA, (None, None)
             dist = None
+            mountain = False
+            if terrain[self.x][self.y][0] >= 5:
+                mountain = True
+
             for i in range(self.x - self.vision_field,
                            self.x + self.vision_field):
                 if i >= 0 and i<(HEIGTH/H_FACTOR):
@@ -593,50 +637,59 @@ class Lynx:
                         if j >= 0 and j<(HEIGTH/H_FACTOR):
                             if not (i == self.x and
                                     j == self.y):  #no nos evaluamos a nosotros mismos
-                                #si vemos una casilla con un lince
                                 try:
+                                    auxDist = Funciones.dist((i, j), (self.x, self.y))
+
+                                    if mountain:
+                                        if terrain[i][j][0] < 5:
+                                            self.lastGreenX = i
+                                            self.lastGreenY = j
+                                    else:
+                                        if terrain[i][j][0] >= 5:
+                                            self.lastMountainX = i
+                                            self.lastMountainY = j
+
+
                                     rabbit_set = {CONEJO, ZANAHORIA_CONEJO, CONEJO_CONEJO, CONEJO_REPRODUCCION}
                                     terrain_obj = terrain[i][j][1]
                                     if terrain_obj in rabbit_set:
                                         if vision_scan == CONEJO and has_hunger:
-                                            auxDist = Funciones.dist((i, j),
-                                                                     (self.x, self.y))
                                             if auxDist < dist:
                                                 dist = auxDist
                                                 nearest_coord = (i, j)
                                         else:
                                             vision_scan, nearest_coord = CONEJO, (i, j)
-                                            dist = Funciones.dist((self.x, self.y), (i, j))
+                                            dist = auxDist
 
                                     elif vision_scan != CONEJO and terrain_obj == CONEJO_LINCE and \
                                             self.hunger * self.risk_aversion < ATTACK_LIMIT and has_hunger:
                                         if vision_scan == CONEJO_LINCE:
-                                            auxDist = Funciones.dist((i, j), (self.x, self.y))
                                             if auxDist < dist:
                                                 dist = auxDist
                                                 nearest_coord = (i, j)
                                         else:
                                             vision_scan, nearest_coord = CONEJO_LINCE, (
                                                 i, j)
-                                            dist = Funciones.dist((self.x, self.y), (i, j))
+                                            dist = auxDist
 
                                     elif vision_scan != CONEJO and vision_scan != CONEJO_LINCE and want_reproduction and \
                                             terrain_obj == LINCE:
                                         if vision_scan == LINCE:
-                                            auxDist = Funciones.dist((i, j),
-                                                                     (self.x, self.y))
                                             if auxDist < dist:
                                                 dist = auxDist
                                                 nearest_coord = (i, j)
                                         else:
                                             vision_scan, nearest_coord = LINCE, (i, j)
-                                            dist = Funciones.dist((self.x, self.y), (i, j))
+                                            dist = auxDist
                                 except IndexError:
                                     pass
 
             #veredicto final vision_scan
             if vision_scan == NADA:
-                self.moveRandom(terrain)
+                if terrain[self.x][self.y][1] < 5 and has_hunger:
+                    self.flee(self.lastMountainX, self.lastMountainY, terrain)
+                else:
+                    self.moveRandom(terrain)
             else:
                 if vision_scan == CONEJO_LINCE:
                     self.wants_fight = True
@@ -646,8 +699,8 @@ class Lynx:
                           terrain)  #vamos a comer o reproducirnos
 
             #Sumamos el hambre
-            self.hunger += HUNGER_LOSS
-            self.reproductive_need += REPRODUCTIVE_FEELING_GAIN
+            self.hunger += LYNX_HUNGER_LOSS
+            self.reproductive_need += LYNX_REPRODUCTIVE_FEELING_GAIN
             if terrain[self.x][self.y][0] >= 5:
                 self.suffocation -= SUFFOCATION_LOSS
             else:
@@ -740,7 +793,7 @@ class Lynx:
 
         extra = EXTRA_STEP if self.strength_speed > random.random() else 0
 
-        for _ in range(MOVES_PER_ACTION + extra):
+        for _ in range(MOVES_PER_ACTION + extra + 1):
             diffX = random_eje_x
             diffY = random_eje_y
 
@@ -752,7 +805,7 @@ class Lynx:
         '''Función para ir a las coordenadas indicadas'''
         extra = EXTRA_STEP if self.strength_speed > random.random() else 0
 
-        for _ in range(MOVES_PER_ACTION + extra):
+        for _ in range(MOVES_PER_ACTION + extra + 1):
             diffX = i - self.x
             diffY = j - self.y
 
@@ -792,7 +845,7 @@ class Lynx:
         elif aux == ZANAHORIA_LINCE:
             terrain[self.x][self.y][1] = ZANAHORIA
         elif aux == LINCE_LINCE or aux == LINCE_REPRODUCCION or aux == PELEA_LINCE:
-            terrain[self.x][self.y][1] = LINCE
+            terrain[self.x][self.y][1] = NADA
 
         gv.lynx_cont -= 1
         gv.lynx_df.loc[self.id-1] = [mode, self.strength_speed, self.risk_aversion, float(get_ticks() // 1000)]
@@ -804,6 +857,20 @@ class Lynx:
             self.eat_ticks = 0
             self.hunger -= HUNGER_QUENCH
             terrain[self.x][self.y][1] = LINCE  #solo estoy yo
+
+    def flee(self, i, j, terrain):
+        '''Función para huir de las coordenadas indicadas'''
+
+        extra = EXTRA_STEP if self.strength_speed > random.random() else 0
+
+        for _ in range(MOVES_PER_ACTION + extra):
+            diffX = self.x - i
+            diffY = self.y - j
+
+            self.move(diffX, diffY, terrain)
+
+        # print(diffX, diffX, self.x, self.y)
+        self.display(terrain)
 
 
 class Zanahoria():
