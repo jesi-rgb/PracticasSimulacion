@@ -442,7 +442,7 @@ class Rabbit:
             y_child = int((self.y+aux_j)%(HEIGTH/H_FACTOR))
             aux_rabbit = Rabbit(terrain, x_child , y_child, risk_av_child, strength_speed_child)
             rabbit_dict[gv.rabbit_id-1] = aux_rabbit
-            terrain[int((self.x+aux_i)%(WIDTH/W_FACTOR))][int((self.y+aux_j)%(HEIGTH/H_FACTOR))][1] = CONEJO
+            terrain[x_child][y_child][1] = CONEJO
 
     def die(self, terrain, rabbit_dict, mode):
         aux = terrain[self.x][self.y][1]
@@ -833,7 +833,7 @@ class Lynx:
             y_child = int((self.y+aux_j)%(HEIGTH/H_FACTOR))
             aux_lynx = Lynx(terrain, x_child , y_child, risk_av_child, strength_speed_child)
             gv.lynx_dict[gv.lynx_id-1] = aux_lynx
-            terrain[int((self.x+aux_i)%(WIDTH/W_FACTOR))][int((self.y+aux_j)%(HEIGTH/H_FACTOR))][1] = LINCE
+            terrain[x_child][y_child][1] = LINCE
 
     def die(self, terrain, lynx_dict, mode):
         aux = terrain[self.x][self.y][1]

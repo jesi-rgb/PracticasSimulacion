@@ -97,6 +97,7 @@ def main():
     down_pressed = None
     sample_time = 20
     raining = False
+    carrot_probability = 0.3
 
     line1 = []
     line2 = []
@@ -104,7 +105,15 @@ def main():
 
     while running:
 
-        if random.random() < 5:
+        if random.random() < 0.01 and not raining:
+            raining = True
+
+        if raining:
+            carrot_probability = 0.8
+            if random.random() < 0.02:
+                raining = False
+
+        if random.random() < carrot_probability:
             Clases.Zanahoria(terrain.manipulable_world)
             Clases.Zanahoria(terrain.manipulable_world)
 
@@ -129,7 +138,10 @@ def main():
 
         # finalmente, reproducimos la nueva imagen
         screen.blit(image, (0, 0))
-        screen.fill((0, 0, 90, 0.5), special_flags=pygame.BLEND_RGBA_ADD)
+
+        if raining:
+            screen.fill((0, 0, 90, 0.5), special_flags=pygame.BLEND_RGBA_ADD)
+
         pygame.display.update()
 
         # reseteamos los mundos para la siguiente iteración
