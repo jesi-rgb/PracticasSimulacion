@@ -11,16 +11,17 @@ class Terrain:
 
     DO NOT FORGET TO ADD SELF in front of any attribute we may want to refer to.
     '''
-    white = np.array([255, 255, 255])
-    orange = np.array([207, 147, 45])
+    white = np.array([255, 255, 255, 255])
+    black = np.array([0, 0, 0, 255])
+    fruitColor = np.array([255, 66, 80, 255])
 
-    blue = np.array([65, 105, 225])
-    green = np.array([34, 139, 34])
-    beach = np.array([240, 233, 175])
-    lightGreen = np.array([119, 204, 65])
-    darkGreen = np.array([17, 74, 17])
-    snow = np.array([250, 250, 250])
-    mountain = np.array([139, 137, 137])
+    darkSand = np.array([214, 170, 75, 255])
+    green = np.array([34, 139, 34, 255])
+    sand = np.array([240, 233, 175, 255])
+    lightGreen = np.array([119, 204, 65, 255])
+    darkGreen = np.array([17, 74, 17, 255])
+    snow = np.array([220, 220, 220, 255])
+    mountain = np.array([139, 137, 137, 255])
 
     seed = 234567546
     world = None
@@ -78,27 +79,27 @@ class Terrain:
         >\> 240 = snow
         '''
 
-        color_world = np.zeros((self.world.shape[0], self.world.shape[1], 3),
+        color_world = np.zeros((self.world.shape[0], self.world.shape[1], 4),
                                'uint8')
 
-        blueCondition = self.world < 60
-        beachCondition = (self.world >= 60) & (self.world < 70)
+        darkSandCondition = self.world < 40
+        sandCondition = (self.world >= 40) & (self.world < 70)
         lightGreenCondition = (self.world >= 70) & (self.world < 100)
         greenCondition = (self.world >= 100) & (self.world < 150)
         darkGreenCondition = (self.world >= 150) & (self.world < 190)
         mountainCondition = (self.world >= 190) & (self.world < 240)
         snowCondition = self.world > 240
 
-        color_world[blueCondition] = self.blue
-        color_world[beachCondition] = self.beach
+        color_world[darkSandCondition] = self.darkSand
+        color_world[sandCondition] = self.sand
         color_world[lightGreenCondition] = self.lightGreen
         color_world[greenCondition] = self.green
         color_world[darkGreenCondition] = self.darkGreen
         color_world[mountainCondition] = self.mountain
         color_world[snowCondition] = self.snow
 
-        self.manipulable_world[blueCondition] = [0, 0]
-        self.manipulable_world[beachCondition] = [1, 0]
+        self.manipulable_world[darkSandCondition] = [0, 0]
+        self.manipulable_world[sandCondition] = [1, 0]
         self.manipulable_world[lightGreenCondition] = [2, 0]
         self.manipulable_world[greenCondition] = [3, 0]
         self.manipulable_world[darkGreenCondition] = [4, 0]
@@ -115,9 +116,9 @@ class Terrain:
         lynxCondition = self.manipulable_world[:, :, 1] == LINCE
 
         self.world[bunnyCondition] = self.white
-        self.world[carrotCondition] = self.orange
-        self.world[eatingCondition] = [255, 80, 80]
-        self.world[lynxCondition] = [0, 0, 0]
+        self.world[carrotCondition] = self.fruitColor
+        self.world[eatingCondition] = [255, 80, 80, 255]
+        self.world[lynxCondition] = self.black
 
     def reset_worlds(self):
         '''Función para resetear ambos mundos y prepararlos para el siguiente tick'''
@@ -130,8 +131,8 @@ class Terrain:
         mountainCondition = self.manipulable_world[:, :, 0] == 5
         snowCondition = self.manipulable_world[:, :, 0] == 6
 
-        self.world[blueCondition] = self.blue
-        self.world[beachCondition] = self.beach
+        self.world[blueCondition] = self.darkSand
+        self.world[beachCondition] = self.sand
         self.world[lightGreenCondition] = self.lightGreen
         self.world[greenCondition] = self.green
         self.world[darkGreenCondition] = self.darkGreen

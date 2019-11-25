@@ -8,12 +8,14 @@ import global_variables as gv
 
 from Funciones import HEIGTH, W_FACTOR, WIDTH, H_FACTOR
 
+initial_rabbits = 150
+initial_lynxes = 40
 
 xs = np.linspace(0,1,101)[0:-1]
-rabbit_data = np.zeros_like(xs)
-lynx_data = np.zeros_like(xs)
-final_graph_r = np.array([0])
-final_graph_l = np.array([0])
+rabbit_data = np.zeros_like(xs) 
+lynx_data = np.zeros_like(xs) 
+final_graph_r = np.array([initial_rabbits])
+final_graph_l = np.array([initial_lynxes])
 final_graph_x = np.array([0])
 
 
@@ -26,14 +28,14 @@ def live_plotter(x_vec, y1_data, y2_data, line1, line2, identifier='', pause_tim
         # create a variable for the line so we can later update it
         line1, = ax.plot(x_vec,y1_data, alpha=0.8, linewidth=2)        
         #update plot label/title
-        plt.ylabel('Conejos')
-        # plt.ylim(top=rabbit_cont + 20)
+        plt.ylabel('Conejos', color='tab:blue')
+
         plt.title(identifier)
 
         ax2 = ax.twinx()  # instantiate a second axes that shares the same x-axis
-        ax2.set_ylabel('Linces')  # we already handled the x-label with ax1
+        ax2.set_ylabel('Linces', color='tab:orange')  # we already handled the x-label with ax1
         line2, = ax2.plot(x_vec, y2_data, color='tab:orange', alpha=0.8, linewidth=2)
-        # ax2.tick_params(axis='y')
+
 
         plt.show()
         
@@ -44,6 +46,7 @@ def live_plotter(x_vec, y1_data, y2_data, line1, line2, identifier='', pause_tim
     # adjust limits if new data goes beyond bounds
     if np.min(y1_data)<=line1.axes.get_ylim()[0] or np.max(y1_data)>=line1.axes.get_ylim()[1]:
         plt.ylim([np.min(y1_data)-np.std(y1_data),np.max(y1_data)+np.std(y1_data)])
+
     # this pauses the data so the figure/axis can catch up - the amount of pause can be altered above
     plt.pause(pause_time)
     
@@ -59,7 +62,7 @@ def simulation_analysis():
     plt.figure(figsize=(5, 5))
     x = np.arange(len(rabbit_data[:-1]))
     plt.plot(final_graph_x[:-1], final_graph_r[:-1], final_graph_x[:-1], final_graph_l[:-1], linewidth=2)    
-    plt.legend(['Rabbits', 'Lynxes'])  
+    plt.legend(['Conejos', 'Linces'])  
     plt.ylabel('Number of entities')
     plt.xlabel('Game ticks')
     plt.title('Population evolution')
@@ -79,12 +82,12 @@ def main():
     pygame.init()
     pygame.display.set_caption("Proyecto Simulacion: Modelo Evolutivo")
 
-    screen = pygame.display.set_mode((WIDTH, HEIGTH))
+    screen = pygame.display.set_mode((WIDTH, HEIGTH), flags=pygame.SRCALPHA)
 
-    for _ in range(150):
+    for _ in range(initial_rabbits):
         gv.rabbit_dict[gv.rabbit_id-1] = Clases.Rabbit(terrain.manipulable_world)
 
-    for _ in range(40):
+    for _ in range(initial_lynxes):
         gv.lynx_dict[gv.lynx_id-1] = Clases.Lynx(terrain.manipulable_world)
 
     for _ in range(50):
@@ -93,6 +96,7 @@ def main():
     running = True
     down_pressed = None
     sample_time = 20
+    raining = False
 
     line1 = []
     line2 = []
@@ -120,11 +124,12 @@ def main():
 
         # generamos la imagen y la updateamos
         image = pygame.image.frombuffer(
-            terrain.world, (WIDTH // W_FACTOR, HEIGTH // H_FACTOR), "RGB")
+            terrain.world, (WIDTH // W_FACTOR, HEIGTH // H_FACTOR), "RGBA")
         image = pygame.transform.scale(image, (WIDTH, HEIGTH))
 
         # finalmente, reproducimos la nueva imagen
         screen.blit(image, (0, 0))
+        screen.fill((0, 0, 90, 0.5), special_flags=pygame.BLEND_RGBA_ADD)
         pygame.display.update()
 
         # reseteamos los mundos para la siguiente iteración
