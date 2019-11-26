@@ -57,16 +57,38 @@ def simulation_analysis():
     print('\n\nSimulation analysis:\n')
     print(gv.rabbit_df.describe())
 
+    
     plt.close()
     plt.ioff()
-    plt.figure(figsize=(5, 5))
+
+    plt.figure(figsize=(10, 5))
+    plt.subplot(131)
     x = np.arange(len(rabbit_data[:-1]))
+    
     plt.plot(final_graph_x[:-1], final_graph_r[:-1], final_graph_x[:-1], final_graph_l[:-1], linewidth=2)    
     plt.legend(['Conejos', 'Linces'])  
-    plt.ylabel('Number of entities')
-    plt.xlabel('Game ticks')
-    plt.title('Population evolution')
+    plt.ylabel('Número de entidades')
+    plt.xlabel('Ticks de la simulación')
+    plt.title('Evolución de la población')
+    
+    r_death_causes = gv.rabbit_df.groupby('Death_cause').count()
+    
+    plt.subplot(132)
+    plt.bar(r_death_causes.index, height=r_death_causes.Speed, color=['tab:orange', 'tab:blue', 'indigo'])
+    plt.title('Cuenta de muertes en conejos')
+    plt.ylabel('Número de muertes')
+
+    l_death_causes = gv.lynx_df.groupby('Death_cause').count()
+    
+    plt.subplot(133)
+    plt.bar(l_death_causes.index, height=l_death_causes.Speed, color=['tab:orange', 'tab:blue', 'indigo'])
+    plt.title('Cuenta de muertes en linces')
+    plt.ylabel('Número de muertes')
+
+    plt.tight_layout()
     plt.show()
+
+
 
 
 # define a main function
@@ -105,13 +127,11 @@ def main():
 
     while running:
 
-        if random.random() < 0.01 and not raining:
-            raining = True
+        if random.random() < 0.01:
+            raining = not raining
 
         if raining:
             carrot_probability = 0.8
-            if random.random() < 0.02:
-                raining = False
 
         if random.random() < carrot_probability:
             Clases.Zanahoria(terrain.manipulable_world)
@@ -140,7 +160,7 @@ def main():
         screen.blit(image, (0, 0))
 
         if raining:
-            screen.fill((0, 0, 90, 0.5), special_flags=pygame.BLEND_RGBA_ADD)
+            screen.fill((0, 0, 100, 0.5), special_flags=pygame.BLEND_RGBA_ADD)
 
         pygame.display.update()
 
@@ -162,6 +182,7 @@ def main():
 
         if down_pressed:
             time.sleep(.33)
+            # print(gv.lynx_dict)
         
         # para el live plotting de las estadísticas
         rabbit_data[-1] = int(gv.rabbit_cont)
