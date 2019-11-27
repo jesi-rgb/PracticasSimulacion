@@ -1,12 +1,12 @@
 LYNX_HUNGER_LOSS = 0.003
-LYNX_REPRODUCTIVE_FEELING_GAIN = 0.0025
+LYNX_REPRODUCTIVE_FEELING_GAIN = 0.005
 LYNX_HUNGER_FEELING_LIMIT = 0.5
 
 LYNX_MAX_INITIAL_HUNGER = 0.5
-LYNX_MAX_INITIAL_REPR = 0.2
+LYNX_MAX_INITIAL_REPR = 0.35
 
 RABBIT_HUNGER_LOSS = 0.01
-RABBIT_REPRODUCTIVE_FEELING_GAIN = 0.015
+RABBIT_REPRODUCTIVE_FEELING_GAIN = 0.023
 RABBIT_HUNGER_FEELING_LIMIT = 0.3
 
 RABBIT_MAX_INITIAL_HUNGER = 0.5
@@ -24,7 +24,7 @@ EAT_DELAY = 2  #ticks
 HUNGER_QUENCH = 0.3
 MOVES_PER_ACTION = 2
 EXTRA_STEP = 1
-MAX_TIME_ALIVE = 1000
+MAX_TIME_ALIVE = 850
 SEMILLA = 918273645
 VISION_LENGTH = 5
 
@@ -84,7 +84,7 @@ class Rabbit:
         self.vision_field = VISION_LENGTH
 
         #Life attributes
-        self.max_time_alive = MAX_TIME_ALIVE * random.uniform(0.6, 1)
+        self.max_time_alive = MAX_TIME_ALIVE * random.uniform(0.1, 0.25)
         self.time_alive = 0
 
         #Map position
@@ -123,7 +123,6 @@ class Rabbit:
 
         gv.rabbit_cont += 1
         terrain[self.x][self.y][1] = CONEJO
-
 
     def display(self, terrain):
         '''Función para editar el valor x, y del mundo donde nos situamos ahora mismo'''
@@ -455,10 +454,15 @@ class Rabbit:
             terrain[self.x][self.y][1] = NADA
         elif aux == PELEA_CONEJO:
             terrain[self.x][self.y][1] = ZANAHORIA_CONEJO
+        else:
+            terrain[self.x][self.y][1] = NADA
 
         gv.rabbit_cont -= 1
         gv.rabbit_df.loc[self.id-1] = [mode, self.strength_speed, self.risk_aversion, float(get_ticks() // 1000)]
-        del gv.rabbit_dict[self.id]
+        try:
+            del gv.rabbit_dict[self.id]
+        except KeyError:
+            pass
 
 
 
@@ -849,8 +853,10 @@ class Lynx:
 
         gv.lynx_cont -= 1
         gv.lynx_df.loc[self.id-1] = [mode, self.strength_speed, self.risk_aversion, float(get_ticks() // 1000)]
-        del gv.lynx_dict[self.id]
-
+        try:
+            del gv.lynx_dict[self.id]
+        except KeyError:
+            pass
     def eat(self, terrain):
         self.eat_ticks += 1
         if self.eat_ticks == EAT_DELAY:

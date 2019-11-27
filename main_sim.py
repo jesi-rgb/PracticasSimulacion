@@ -44,8 +44,8 @@ def live_plotter(x_vec, y1_data, y2_data, line1, line2, identifier='', pause_tim
     line1.set_ydata(y1_data)
     line2.set_ydata(y2_data)
     # adjust limits if new data goes beyond bounds
-    if np.min(y1_data)<=line1.axes.get_ylim()[0] or np.max(y1_data)>=line1.axes.get_ylim()[1]:
-        plt.ylim([np.min(y1_data)-np.std(y1_data),np.max(y1_data)+np.std(y1_data)])
+    # if np.min(y1_data)<=line1.axes.get_ylim()[0] or np.max(y1_data)>=line1.axes.get_ylim()[1]:
+    #     plt.ylim([np.min(y1_data)-np.std(y1_data),np.max(y1_data)+np.std(y1_data)])
 
     # this pauses the data so the figure/axis can catch up - the amount of pause can be altered above
     plt.pause(pause_time)
@@ -131,11 +131,17 @@ def main():
             raining = not raining
 
         if raining:
-            carrot_probability = 0.8
+            # carrot_probability = 0.8
+            Clases.Zanahoria(terrain.manipulable_world)
+            Clases.Zanahoria(terrain.manipulable_world)
+            Clases.Zanahoria(terrain.manipulable_world)
+        else:
+            Clases.Zanahoria(terrain.manipulable_world)
+            Clases.Zanahoria(terrain.manipulable_world)
 
-        if random.random() < carrot_probability:
-            Clases.Zanahoria(terrain.manipulable_world)
-            Clases.Zanahoria(terrain.manipulable_world)
+        # if random.random() < carrot_probability:
+        #     Clases.Zanahoria(terrain.manipulable_world)
+        #     Clases.Zanahoria(terrain.manipulable_world)
 
         rabbits = list(gv.rabbit_dict.values())
         if len(rabbits) == 0:
