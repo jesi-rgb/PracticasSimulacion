@@ -84,7 +84,7 @@ class Rabbit:
         self.vision_field = VISION_LENGTH
 
         #Life attributes
-        self.max_time_alive = MAX_TIME_ALIVE * random.uniform(0.1, 0.25)
+        self.max_time_alive = MAX_TIME_ALIVE * random.uniform(0.25, 0.4)
         self.time_alive = 0
 
         #Map position
@@ -166,7 +166,7 @@ class Rabbit:
         if self.time_alive >= self.max_time_alive:
             self.die(terrain, gv.rabbit_dict, OLD_AGE)
 
-        if terrain[self.x][self.y][1] == ZANAHORIA_CONEJO:
+        elif terrain[self.x][self.y][1] == ZANAHORIA_CONEJO:
             self.eat(terrain)
 
         elif terrain[self.x][self.y][1] == CONEJO_REPRODUCCION and self.reproductive_need > REPRODUCTIONH_FEELING_LIMIT:
@@ -444,6 +444,8 @@ class Rabbit:
             terrain[x_child][y_child][1] = CONEJO
 
     def die(self, terrain, rabbit_dict, mode):
+        if mode == OLD_AGE:
+            print(terrain[self.x][self.y][1])
         aux = terrain[self.x][self.y][1]
 
         if aux == CONEJO:
@@ -570,7 +572,7 @@ class Lynx:
         if self.time_alive >= self.max_time_alive:
             self.die(terrain, gv.lynx_dict, OLD_AGE)
 
-        if terrain[self.x][self.y][1] == CONEJO_LINCE:
+        elif terrain[self.x][self.y][1] == CONEJO_LINCE:
             self.eat(terrain)
         elif terrain[self.x][self.y][1] == LINCE_REPRODUCCION and self.reproductive_need > REPRODUCTIONH_FEELING_LIMIT:
             if lynx_reproduction_dict[str(self.x)+"-"+str(self.y)] == None:
