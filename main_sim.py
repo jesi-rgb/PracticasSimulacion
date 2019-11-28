@@ -69,13 +69,16 @@ def simulation_analysis():
     plt.close()
     plt.ioff()
 
-    plt.figure(figsize=(10, 5))
-    plt.subplot(131)
+    rx = plt.figure(figsize=(12, 5)).add_subplot(131)
+    lx = rx.twinx()
+    # plt.subplot(131)
     x = np.arange(len(rabbit_data[:-1]))
     
-    plt.plot(final_graph_x[:-1], final_graph_r[:-1], final_graph_x[:-1], final_graph_l[:-1], linewidth=2)    
-    plt.legend(['Conejos', 'Linces'])  
-    plt.ylabel('Número de entidades')
+    rx.plot(final_graph_x[:-1], final_graph_r[:-1], linewidth=2, color='tab:blue')
+    rx.set_ylabel('Conejos', color='tab:blue')   
+    lx.plot(final_graph_x[:-1], final_graph_l[:-1], linewidth=2, color='tab:orange')
+    lx.set_ylabel('Linces', color='tab:orange')
+    
     plt.xlabel('Ticks de la simulación')
     plt.title('Evolución de la población')
     

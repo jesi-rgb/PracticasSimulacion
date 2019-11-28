@@ -444,8 +444,8 @@ class Rabbit:
             terrain[x_child][y_child][1] = CONEJO
 
     def die(self, terrain, rabbit_dict, mode):
-        if mode == OLD_AGE:
-            print(terrain[self.x][self.y][1])
+        # if mode == OLD_AGE:
+        #     print(terrain[self.x][self.y][1])
         aux = terrain[self.x][self.y][1]
 
         if aux == CONEJO:
