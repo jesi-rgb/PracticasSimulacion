@@ -12,3 +12,6 @@ lynx_dict = dict()
 lynx_cont = 0
 lynx_id = 1
 
+speed_mean = 0
+risk_mean = 0
+

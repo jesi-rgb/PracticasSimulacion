@@ -31,3 +31,6 @@ def cruce_and_mutate(risk_av1, risk_av2, strength_spe1, strength_spe2):
 
 
     return risk_av, strength_spe
+
+def addToAverage(average, size, value):
+    return (size * average + value) / (size + 1)

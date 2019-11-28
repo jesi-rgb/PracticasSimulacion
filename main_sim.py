@@ -6,7 +6,7 @@ import time, random, numpy as np
 import matplotlib.pyplot as plt
 import global_variables as gv
 
-from Funciones import HEIGTH, W_FACTOR, WIDTH, H_FACTOR
+from Funciones import HEIGTH, W_FACTOR, WIDTH, H_FACTOR, addToAverage
 
 initial_rabbits = 150
 initial_lynxes = 40
@@ -20,6 +20,8 @@ final_graph_x = np.array([0])
 
 ax = plt.figure(figsize=(6, 5)).add_subplot(111)
 ax2 = ax.twinx()
+
+speed_evo_track = []
 
 
 def live_plotter(x_vec, y1_data, y2_data, line1, line2, identifier='', pause_time=0.01):
@@ -65,13 +67,13 @@ def simulation_analysis():
     print('\n\nSimulation analysis:\n')
     print(gv.rabbit_df.describe())
 
-    
     plt.close()
     plt.ioff()
+    filas, columnas = 2, 3
 
-    rx = plt.figure(figsize=(12, 5)).add_subplot(131)
+    # Gráfica de evolución de la población
+    rx = plt.figure(figsize=(12, 7)).add_subplot(filas, columnas, 1)
     lx = rx.twinx()
-    # plt.subplot(131)
     x = np.arange(len(rabbit_data[:-1]))
     
     rx.plot(final_graph_x[:-1], final_graph_r[:-1], linewidth=2, color='tab:blue')
@@ -82,16 +84,18 @@ def simulation_analysis():
     plt.xlabel('Ticks de la simulación')
     plt.title('Evolución de la población')
     
+    # Barras de muertes de conejos
     r_death_causes = gv.rabbit_df.groupby('Death_cause').count()
     
-    plt.subplot(132)
+    plt.subplot(filas, columnas, 2)
     plt.bar(r_death_causes.index, height=r_death_causes.Speed, color=['tab:orange', 'tab:blue', 'indigo'])
     plt.title('Cuenta de muertes en conejos')
     plt.ylabel('Número de muertes')
 
+    # Barras de muertes de linces 
     l_death_causes = gv.lynx_df.groupby('Death_cause').count()
     
-    plt.subplot(133)
+    plt.subplot(filas, columnas, 3)
     plt.bar(l_death_causes.index, height=l_death_causes.Speed, color=['tab:orange', 'tab:blue', 'indigo'])
     plt.title('Cuenta de muertes en linces')
     plt.ylabel('Número de muertes')
@@ -149,11 +153,6 @@ def main():
         else:
             Clases.Zanahoria(terrain.manipulable_world)
             Clases.Zanahoria(terrain.manipulable_world)
-
-        # if random.random() < carrot_probability:
-        #     Clases.Zanahoria(terrain.manipulable_world)
-        #     Clases.Zanahoria(terrain.manipulable_world)
-
         
         rabbits = list(gv.rabbit_dict.values())
         if len(rabbits) == 0:
@@ -210,10 +209,11 @@ def main():
         final_graph_r = np.append(final_graph_r, int(gv.rabbit_cont))
         final_graph_x = np.append(final_graph_x, int(pygame.time.get_ticks() // 1000))
 
-        # np.append(xs, int(pygame.time.get_ticks() // 1000))
         line1, line2 = live_plotter(xs, rabbit_data, lynx_data, line1, line2, 'Contador Conejos vs Linces')
         rabbit_data = np.append(rabbit_data[1:], 0.0)
         lynx_data = np.append(lynx_data[1:], 0.0)
+
+
         
 
     
