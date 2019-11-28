@@ -18,35 +18,43 @@ final_graph_r = np.array([initial_rabbits])
 final_graph_l = np.array([initial_lynxes])
 final_graph_x = np.array([0])
 
+ax = plt.figure(figsize=(6, 5)).add_subplot(111)
+ax2 = ax.twinx()
+
 
 def live_plotter(x_vec, y1_data, y2_data, line1, line2, identifier='', pause_time=0.01):
+
+    global ax, ax2
+
     if line1==[] and line2 == []:
-        # this is the call to matplotlib that allows dynamic plotting
-        plt.ion()
-        fig = plt.figure(figsize=(6, 5))
-        ax = fig.add_subplot(111)
         # create a variable for the line so we can later update it
-        line1, = ax.plot(x_vec,y1_data, alpha=0.8, linewidth=2)        
-        #update plot label/title
-        plt.ylabel('Conejos', color='tab:blue')
-
+        plt.ion()
         plt.title(identifier)
+        
+        ax.set_ylabel('Conejos', color='tab:blue')
+        ax.set_ylim([np.min(y1_data) - np.std(y1_data), np.max(y1_data) + np.std(y1_data)])
 
-        ax2 = ax.twinx()  # instantiate a second axes that shares the same x-axis
-        ax2.set_ylabel('Linces', color='tab:orange')  # we already handled the x-label with ax1
-        line2, = ax2.plot(x_vec, y2_data, color='tab:orange', alpha=0.8, linewidth=2)
-
+        ax2.set_ylabel('Linces', color='tab:orange')
+        ax2.set_ylim([np.min(y2_data) - np.std(y2_data), np.max(y2_data) + np.std(y2_data)])
+        
+        line1, = ax.plot(x_vec,y1_data, alpha=0.8, linewidth=2)    
+        line2, = ax2.plot(x_vec, y2_data, color='tab:orange', alpha=0.8, linewidth=2)    
 
         plt.show()
-        
+
     
     # after the figure, axis, and line are created, we only need to update the y-data
     line1.set_ydata(y1_data)
     line2.set_ydata(y2_data)
-    # adjust limits if new data goes beyond bounds
-    # if np.min(y1_data)<=line1.axes.get_ylim()[0] or np.max(y1_data)>=line1.axes.get_ylim()[1]:
-    #     plt.ylim([np.min(y1_data)-np.std(y1_data),np.max(y1_data)+np.std(y1_data)])
 
+    # adjust limits if new data goes beyond bounds
+    if np.min(y1_data) <= line1.axes.get_ylim()[0] or np.max(y1_data) >= line1.axes.get_ylim()[1]:
+        ax.set_ylim([np.min(y1_data) - np.std(y1_data), np.max(y1_data) + np.std(y1_data)])
+
+    if np.min(y2_data) <= line2.axes.get_ylim()[0] or np.max(y2_data) >= line2.axes.get_ylim()[1]:
+        ax2.set_ylim([np.min(y2_data) - np.std(y2_data), np.max(y2_data) + np.std(y2_data)])
+    
+    
     # this pauses the data so the figure/axis can catch up - the amount of pause can be altered above
     plt.pause(pause_time)
     
@@ -143,6 +151,7 @@ def main():
         #     Clases.Zanahoria(terrain.manipulable_world)
         #     Clases.Zanahoria(terrain.manipulable_world)
 
+        
         rabbits = list(gv.rabbit_dict.values())
         if len(rabbits) == 0:
             running = False
