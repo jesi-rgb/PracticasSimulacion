@@ -39,7 +39,6 @@ Modelos de Simulación
 - Monitorización y Contadores estadísticos
 - Eventos
 
----
 
 ## Simulador de selección natural
 ### Formulación del problema
@@ -58,7 +57,6 @@ Pese a ser posible, hay diferentes motivos por los cuales no sería recomendable
 
 Otro motivo es la incapacidad de observar la historia a través de un modelo matemático. Esto impediría la obtención de estadísticas que nos permiten tener una mayor comprensión del modelo y ser capaces de dar una mejor explicación a los resultados.
 
----
 
 ## Definición del sistema
 El sistema propuesto consistirá en un entorno en el que varios tipos de entidades desarrollen su vida y reaccionen a las diferentes adversidades que se interpongan en ella.  Estas entidades serán Conejos y Linces.
@@ -72,7 +70,6 @@ Las variables de estado que van a definir nuestro sistema serán:
 - Número de Linces.
 - Atributos de cada una de estas entidades.
 
----
 
 ## Definición del modelo
 El objetivo es crear un sistema similar a un algoritmo genético basado en selección natural que nos dé información acerca de cuál es la mejor combinación de genes para cada individuo de forma que le permita sobrevivir lo máximo posible.
@@ -86,10 +83,9 @@ Esta estructura lógica será la siguiente:
 Los conejos se alimentan de zanahorias. 
 Los linces se alimentan de conejos.
 
----
 
 ## Terreno
-<img src='media/mapa_definitivo 800x800.png'>
+<img src='media/mapa definitivo 800x800.png'>
 
 El terreno se ha generado proceduralmente como un mapa de alturas, de acuerdo al modelo de ruido de Perlin (mucho más conocido como Perlin Noise), que nos permite crear una matriz de valores y asociarles una altura en función del valor para generar los biomas necesarios, como praderas o montañas.
 
