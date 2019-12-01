@@ -2,6 +2,7 @@ import noise
 import numpy as np
 from PIL import Image
 from Clases import CONEJO, LINCE, ZANAHORIA, ZANAHORIA_CONEJO
+from Funciones import HEIGTH, W_FACTOR, WIDTH, H_FACTOR
 
 
 class Terrain:
@@ -146,9 +147,11 @@ if __name__ == "__main__":
     # octaves = 6
     # persistence = 0.45
     # lacunarity = 2
-    terrain = Terrain((800, 800), 500.0, 6, 0.45, 2)
+    terrain = Terrain((WIDTH // W_FACTOR, HEIGTH // H_FACTOR), 100.0, 22.55,
+                      89.55, 6, 0.45, 2)
     terrain.add_color()
-    np.save("Terrain", terrain.world)
-    np.save("Manipulable_terrain", terrain.manipulable_world)
-    print(terrain.manipulable_world.shape)
+
+    img = Image.fromarray(terrain.world)
+    img = img.resize((800, 800))
+    img.save('mapa definitivo.png')
     terrain.display_world()
