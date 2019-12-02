@@ -16,6 +16,10 @@ rabbit_data = np.zeros_like(xs)
 lynx_data = np.zeros_like(xs) 
 final_graph_r = np.array([initial_rabbits])
 final_graph_l = np.array([initial_lynxes])
+final_graph_speed_r = np.array([])
+final_graph_speed_l = np.array([])
+final_graph_risk_r = np.array([])
+final_graph_risk_l = np.array([])
 final_graph_x = np.array([0])
 
 ax = plt.figure(figsize=(6, 5)).add_subplot(111)
@@ -32,13 +36,14 @@ def live_plotter(x_vec, y1_data, y2_data, line1, line2, identifier='', pause_tim
         # create a variable for the line so we can later update it
         plt.ion()
         plt.title(identifier)
+
         
         ax.set_ylabel('Conejos', color='tab:blue')
         ax.set_ylim([np.min(y1_data) - np.std(y1_data), np.max(y1_data) + np.std(y1_data)])
 
         ax2.set_ylabel('Linces', color='tab:orange')
         ax2.set_ylim([np.min(y2_data) - np.std(y2_data), np.max(y2_data) + np.std(y2_data)])
-        
+
         line1, = ax.plot(x_vec,y1_data, alpha=0.8, linewidth=2)    
         line2, = ax2.plot(x_vec, y2_data, color='tab:orange', alpha=0.8, linewidth=2)    
 
@@ -76,29 +81,46 @@ def simulation_analysis():
     lx = rx.twinx()
     x = np.arange(len(rabbit_data[:-1]))
     
-    rx.plot(final_graph_x[:-1], final_graph_r[:-1], linewidth=2, color='tab:blue')
+
+    rx.plot(final_graph_x[:-1], final_graph_r[:-1], linewidth=1.5, color='tab:blue')
     rx.set_ylabel('Conejos', color='tab:blue')   
-    lx.plot(final_graph_x[:-1], final_graph_l[:-1], linewidth=2, color='tab:orange')
+    lx.plot(final_graph_x[:-1], final_graph_l[:-1], linewidth=1.5, color='tab:orange')
     lx.set_ylabel('Linces', color='tab:orange')
-    
+
     plt.xlabel('Ticks de la simulación')
     plt.title('Evolución de la población')
     
     # Barras de muertes de conejos
     r_death_causes = gv.rabbit_df.groupby('Death_cause').count()
-    
+
     plt.subplot(filas, columnas, 2)
-    plt.bar(r_death_causes.index, height=r_death_causes.Speed, color=['tab:orange', 'tab:blue', 'indigo'])
+    plt.bar(r_death_causes.index, height=r_death_causes.Speed, color=['tab:orange', 'tab:blue', 'indigo', 'blue'])
     plt.title('Cuenta de muertes en conejos')
     plt.ylabel('Número de muertes')
 
+    
     # Barras de muertes de linces 
     l_death_causes = gv.lynx_df.groupby('Death_cause').count()
-    
+
     plt.subplot(filas, columnas, 3)
-    plt.bar(l_death_causes.index, height=l_death_causes.Speed, color=['tab:orange', 'tab:blue', 'indigo'])
+    plt.bar(l_death_causes.index, height=l_death_causes.Speed, color=['tab:orange', 'tab:blue', 'indigo', 'blue'])
     plt.title('Cuenta de muertes en linces')
     plt.ylabel('Número de muertes')
+
+    # Gráfica de evolución de velocidad
+    plt.subplot(filas, columnas, 4)
+
+    plt.plot(final_graph_x[:-1], final_graph_speed_r, final_graph_x[:-1], final_graph_speed_l)
+    plt.title('Evolución del gen Velocidad/Fuerza')
+    plt.legend(['Conejos', 'Linces'])
+
+    # Gráfica de evolución de velocidad
+    plt.subplot(filas, columnas, 5)
+
+    plt.plot(final_graph_x[:-1], final_graph_risk_r, final_graph_x[:-1], final_graph_risk_l)
+    plt.title('Evolución del gen Aversión al riesgo')
+    plt.legend(['Conejos', 'Linces'])
+
 
     plt.tight_layout()
     plt.show()
@@ -108,7 +130,7 @@ def simulation_analysis():
 
 # define a main function
 def main():
-    global rabbit_data, lynx_data, xs, final_graph_l, final_graph_r, final_graph_x
+    global rabbit_data, lynx_data, xs, final_graph_l, final_graph_r, final_graph_x, final_graph_speed_l, final_graph_speed_r, final_graph_risk_r, final_graph_risk_l
 
     terrain = Terrain((WIDTH // W_FACTOR, HEIGTH // H_FACTOR), 100.0, 22.55,
                       89.55, 6, 0.45, 2)
@@ -132,7 +154,6 @@ def main():
 
     running = True
     down_pressed = None
-    sample_time = 20
     raining = False
     carrot_probability = 0.3
 
@@ -142,7 +163,7 @@ def main():
 
     while running:
 
-        if random.random() < 0.01:
+        if random.random() < 0.006:
             raining = not raining
 
         if raining:
@@ -154,16 +175,33 @@ def main():
             Clases.Zanahoria(terrain.manipulable_world)
             Clases.Zanahoria(terrain.manipulable_world)
         
+        
         rabbits = list(gv.rabbit_dict.values())
-        if len(rabbits) == 0:
+        lynxes = list(gv.lynx_dict.values())
+        
+        if len(rabbits) == 0 or len(lynxes) == 0:
             running = False
+        
+        aux_mean_speed_r = np.array([])
+        aux_mean_risk_r = np.array([])
         for x in rabbits:
             x.action(terrain.manipulable_world, gv.rabbit_dict)
+            aux_mean_speed_r = np.append(aux_mean_speed_r, x.strength_speed)
+            aux_mean_risk_r = np.append(aux_mean_risk_r, x.risk_aversion)
 
-        lynxes = list(gv.lynx_dict.values())
+        final_graph_speed_r = np.append(final_graph_speed_r, np.mean(aux_mean_speed_r))
+        final_graph_risk_r = np.append(final_graph_risk_r, np.mean(aux_mean_risk_r))
+
+
+        aux_mean_speed_l = np.array([])
+        aux_mean_risk_l = np.array([])
         for x in lynxes:
             x.action(terrain.manipulable_world, gv.lynx_dict)
+            aux_mean_speed_l = np.append(aux_mean_speed_l, x.strength_speed)
+            aux_mean_risk_l = np.append(aux_mean_risk_l, x.risk_aversion)
 
+        final_graph_speed_l = np.append(final_graph_speed_l, np.mean(aux_mean_speed_l))
+        final_graph_risk_l = np.append(final_graph_risk_l, np.mean(aux_mean_risk_l))
 
         # generamos terrain.world from manipulable world
         terrain.recalculate_world()
@@ -199,7 +237,6 @@ def main():
 
         if down_pressed:
             time.sleep(.33)
-            # print(gv.lynx_dict)
         
         # para el live plotting de las estadísticas
         rabbit_data[-1] = int(gv.rabbit_cont)
@@ -212,9 +249,6 @@ def main():
         line1, line2 = live_plotter(xs, rabbit_data, lynx_data, line1, line2, 'Contador Conejos vs Linces')
         rabbit_data = np.append(rabbit_data[1:], 0.0)
         lynx_data = np.append(lynx_data[1:], 0.0)
-
-
-        
 
     
 
