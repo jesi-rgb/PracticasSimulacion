@@ -95,7 +95,7 @@ def simulation_analysis():
     r_death_causes = gv.rabbit_df.groupby('Death_cause').count()
 
     plt.subplot(filas, columnas, 2)
-    plt.bar(r_death_causes.index, height=r_death_causes.Speed, color=['tab:orange', 'tab:blue', 'indigo', 'blue'])
+    plt.bar(r_death_causes.index, height=r_death_causes.Speed, color=['tab:orange', 'tab:blue', 'forestgreen', 'gold'])
     plt.title('Cuenta de muertes en conejos')
     plt.ylabel('Número de muertes')
 
@@ -104,7 +104,7 @@ def simulation_analysis():
     l_death_causes = gv.lynx_df.groupby('Death_cause').count()
 
     plt.subplot(filas, columnas, 3)
-    plt.bar(l_death_causes.index, height=l_death_causes.Speed, color=['tab:orange', 'tab:blue', 'indigo', 'blue'])
+    plt.bar(l_death_causes.index, height=l_death_causes.Speed, color=['tab:orange', 'tab:blue', 'forestgreen', 'gold'])
     plt.title('Cuenta de muertes en linces')
     plt.ylabel('Número de muertes')
 
