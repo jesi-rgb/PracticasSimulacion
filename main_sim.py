@@ -21,6 +21,7 @@ final_graph_speed_l = np.array([])
 final_graph_risk_r = np.array([])
 final_graph_risk_l = np.array([])
 final_graph_x = np.array([0])
+final_graph_rain = np.array([])
 
 ax = plt.figure(figsize=(6, 5)).add_subplot(111)
 ax2 = ax.twinx()
@@ -107,15 +108,22 @@ def simulation_analysis():
     plt.title('Cuenta de muertes en linces')
     plt.ylabel('Número de muertes')
 
-    # Gráfica de evolución de velocidad
+    # Gráfica de lluvia
     plt.subplot(filas, columnas, 4)
+    plt.plot(final_graph_x[:-1], final_graph_rain)
+    plt.title('Momentos en los que ha llovido')
+    plt.xlabel('Ticks del juego')
+
+
+    # Gráfica de evolución de velocidad
+    plt.subplot(filas, columnas, 5)
 
     plt.plot(final_graph_x[:-1], final_graph_speed_r, final_graph_x[:-1], final_graph_speed_l)
     plt.title('Evolución del gen Velocidad/Fuerza')
     plt.legend(['Conejos', 'Linces'])
 
     # Gráfica de evolución de velocidad
-    plt.subplot(filas, columnas, 5)
+    plt.subplot(filas, columnas, 6)
 
     plt.plot(final_graph_x[:-1], final_graph_risk_r, final_graph_x[:-1], final_graph_risk_l)
     plt.title('Evolución del gen Aversión al riesgo')
@@ -130,7 +138,7 @@ def simulation_analysis():
 
 # define a main function
 def main():
-    global rabbit_data, lynx_data, xs, final_graph_l, final_graph_r, final_graph_x, final_graph_speed_l, final_graph_speed_r, final_graph_risk_r, final_graph_risk_l
+    global rabbit_data, lynx_data, xs, final_graph_l, final_graph_rain, final_graph_r, final_graph_x, final_graph_speed_l, final_graph_speed_r, final_graph_risk_r, final_graph_risk_l
 
     terrain = Terrain((WIDTH // W_FACTOR, HEIGTH // H_FACTOR), 100.0, 22.55,
                       89.55, 6, 0.45, 2)
@@ -216,6 +224,9 @@ def main():
 
         if raining:
             screen.fill((0, 0, 100, 0.5), special_flags=pygame.BLEND_RGBA_ADD)
+            final_graph_rain = np.append(final_graph_rain, 1)
+        else:
+            final_graph_rain = np.append(final_graph_rain, 0)
 
         pygame.display.update()
 
