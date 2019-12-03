@@ -224,9 +224,9 @@ def main():
 
         if raining:
             screen.fill((0, 0, 100, 0.5), special_flags=pygame.BLEND_RGBA_ADD)
-            final_graph_rain = np.append(final_graph_rain, 1)
+            final_graph_rain = np.append(final_graph_rain, 'Raining')
         else:
-            final_graph_rain = np.append(final_graph_rain, 0)
+            final_graph_rain = np.append(final_graph_rain, 'Not Raining')
 
         pygame.display.update()
 
