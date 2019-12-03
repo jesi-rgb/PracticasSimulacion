@@ -10,11 +10,6 @@ def dist(position, target):
     return math.sqrt((position[0] - target[0])**2 +
                      (position[1] - target[1])**2)
 
-
-def nextTime(rabbit_list, lynx_list):
-    pass
-
-
 def cruce_and_mutate(risk_av1, risk_av2, strength_spe1, strength_spe2):
     #Cruce
     percentaje_risk = random.random()
@@ -31,6 +26,3 @@ def cruce_and_mutate(risk_av1, risk_av2, strength_spe1, strength_spe2):
 
 
     return risk_av, strength_spe
-
-def addToAverage(average, size, value):
-    return (size * average + value) / (size + 1)

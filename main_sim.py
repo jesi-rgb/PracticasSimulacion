@@ -2,11 +2,11 @@
 import pygame
 from TerrainGenerator import Terrain
 import Clases
-import time, random, numpy as np
+import numpy as np
 import matplotlib.pyplot as plt
 import global_variables as gv
 
-from Funciones import HEIGTH, W_FACTOR, WIDTH, H_FACTOR, addToAverage
+from Funciones import HEIGTH, W_FACTOR, WIDTH, H_FACTOR
 
 initial_rabbits = 150
 initial_lynxes = 40
@@ -25,8 +25,6 @@ final_graph_rain = np.array([])
 
 ax = plt.figure(figsize=(6, 5)).add_subplot(111)
 ax2 = ax.twinx()
-
-speed_evo_track = []
 
 
 def live_plotter(x_vec, y1_data, y2_data, line1, line2, identifier='', pause_time=0.01):
@@ -171,7 +169,7 @@ def main():
 
     while running:
 
-        if random.random() < 0.006:
+        if np.random.random() < 0.006:
             raining = not raining
 
         if raining:
